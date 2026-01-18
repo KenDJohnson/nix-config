@@ -1,0 +1,6 @@
+# -*- mode: sh; sh-shell zsh -*-
+
+notify() {
+    printf '\x1b]9;[%s] '
+    # TODO OSC 777 has title and body
+}

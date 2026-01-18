@@ -1,0 +1,10 @@
+# -*- mode: snippet -*-
+# name: #+begin_src bash :results ... block
+# uuid: bash-src
+# key: <b
+# condition: t
+# --
+#+name: $1
+#+begin_src ${2:bash} :results output raw
+`%`$0
+#+end_src

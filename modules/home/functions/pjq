@@ -1,0 +1,11 @@
+# -*- mode: sh; sh-shell zsh -*-
+
+pjq() {
+    local file="$1"
+    if [[ $# -gt 1 ]]; then
+        shift
+        /usr/bin/plutil -convert json -o - "$file" | jq "$@"
+    else
+        /usr/bin/plutil -convert json -o - "$file" | jq "."
+    fi
+}

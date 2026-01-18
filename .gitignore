@@ -1,0 +1,24 @@
+# Nix build outputs
+result
+result-*
+
+# Logs
+*.log
+
+# Doom Emacs generated secrets
+modules/home/doom.d/secrets.el
+
+# Decrypted secrets (should never be committed)
+secrets/*.txt
+secrets/*.dec
+!secrets/*.age
+!secrets/secrets.nix
+
+# Editor backups
+*~
+*.swp
+*.swo
+.#*
+
+# macOS
+.DS_Store

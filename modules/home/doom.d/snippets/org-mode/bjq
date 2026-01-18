@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: bash src with jq
+# key: <bjq
+# condition: t
+# --
+#+name: $1
+#+begin_src ${2:bash} :results output raw :wrap src json :stdin $3
+`%`$0
+#+end_src
