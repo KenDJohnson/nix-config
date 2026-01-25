@@ -51,16 +51,17 @@
         wvous-tr-corner = 1;
         persistent-apps = [
           "/Applications/Google Chrome.app"
-          "${pkgs.emacs}/Applications/Emacs.app"
-          "${pkgs.ghostty-bin}/Applications/Ghostty.app"
+          "${host.homeDirectory}/Applications/Home Manager Apps/Emacs.app"
+          "${host.homeDirectory}/Applications/Home Manager Apps/Zed.app"
+          "${host.homeDirectory}/Applications/Home Manager Apps/Ghostty.app"
         ] ++ lib.optionals (host.systemType == "work") [
           "/Applications/Slack.app"
         ] ++ [
-          "${pkgs.imhex}/Applications/imhex.app"
+          "${host.homeDirectory}/Applications/Home Manager Apps/imhex.app"
         ] ++ lib.optionals (host.systemType == "work") [
           "/Applications/zoom.us.app"
         ] ++ lib.optionals (host.systemType == "personal") [
-          "${pkgs.utm}/Applications/UTM.app"
+          "${host.homeDirectory}/Applications/Home Manager Apps/UTM.app"
           "/System/Applications/Messages.app"
         ];
       };
