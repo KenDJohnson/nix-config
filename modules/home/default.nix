@@ -282,6 +282,9 @@ in {
         use jc
       '';
     };
+    obsidian = {
+      enable = true;
+    };
     fzf = {
       enable = true;
       enableZshIntegration = true;
