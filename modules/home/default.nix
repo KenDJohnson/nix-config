@@ -1,24 +1,44 @@
-{ inputs, pkgs, lib, config, host, ... }:
-let
+{
+  inputs,
+  pkgs,
+  lib,
+  config,
+  host,
+  ...
+}: let
   homeDir = host.homeDirectory;
   in-home = path: "${homeDir}/${path}";
-  doom-dir = (in-home ".doom.d/");
+  doom-dir = in-home ".doom.d/";
 in {
   imports = [
     (import ./zsh.nix {
-      inherit pkgs lib config host;
+      inherit
+        pkgs
+        lib
+        config
+        host
+        ;
     })
     (import ./ssh.nix {
       inherit pkgs lib config;
     })
     (import ./secrets.nix {
-      inherit config lib pkgs host;
+      inherit
+        config
+        lib
+        pkgs
+        host
+        ;
     })
   ];
 
   manual = {
-    json.enable = true;
-    manpages.enable = true;
+    # Upstream currently emits a context warning when building docs.options.json.
+    # Keep this off unless you explicitly need the JSON options export.
+    json.enable = false;
+    # Manpage generation uses the same options-doc pipeline and triggers the
+    # same context warning in current Home Manager.
+    manpages.enable = false;
   };
 
   fonts.fontconfig = {
@@ -31,106 +51,110 @@ in {
   home = {
     username = host.username;
     homeDirectory = host.homeDirectory;
-    packages = [
-      inputs.ragenix.packages.${pkgs.system}.default
-    ] ++ (with pkgs; [
-      curl
-      fd
-      jq
-      less
-      ripgrep
-      tree-sitter
-      wget
-      #rustup
-      jc
-      mermaid-cli
-      zola
-      #kicad
-      _1password-cli
-      fontconfig
-      # ghostty-bin
-      coreutils
-      direnv
-      alejandra
+    packages =
+      [
+        inputs.ragenix.packages.${pkgs.stdenv.hostPlatform.system}.default
+      ]
+      ++ (with pkgs; [
+        curl
+        fd
+        jq
+        less
+        ripgrep
+        tree-sitter
+        wget
+        #rustup
+        jc
+        mermaid-cli
+        zola
+        #kicad
+        _1password-cli
+        fontconfig
+        # ghostty-bin
+        coreutils
+        direnv
+        alejandra
 
-      imhex
-      tokei
+        imhex
+        tokei
 
-      # (fenix.complete.withComponents [
-      #   "cargo"
-      #   "clippy"
-      #   "rust-src"
-      #   "rustc"
-      #   "rustfmt"
-      # ])
-      # rust-analyzer-nightly
+        # (fenix.complete.withComponents [
+        #   "cargo"
+        #   "clippy"
+        #   "rust-src"
+        #   "rustc"
+        #   "rustfmt"
+        # ])
+        # rust-analyzer-nightly
 
-      shfmt
-      shellcheck
-      bash-language-server
-      ffmpeg
-      gnupg
-      yubikey-manager
+        shfmt
+        shellcheck
+        bash-language-server
+        ffmpeg
+        gnupg
+        yubikey-manager
 
-      devenv
-      manix
-      statix
-      nil
-      nix-search
+        devenv
+        manix
+        statix
+        nil
+        nix-search
 
-      (texliveFull.withPackages (
-        ps: with ps; [
-          tidyres
-          paracol
-        ]
-      ))
-      ghostscript
+        (texliveFull.withPackages (
+          ps:
+            with ps; [
+              tidyres
+              paracol
+            ]
+        ))
+        ghostscript
 
-      capnproto
-      capnproto-rust
-      protobuf
+        capnproto
+        capnproto-rust
+        protobuf
 
-      gnumake
-      llvm
-      # libllvm
-      clang
-      # libclang
-      # clang-tools
-      libiconv
+        gnumake
+        llvm
+        # libllvm
+        clang
+        # libclang
+        # clang-tools
+        libiconv
 
-      btop
+        btop
 
-      uv
-      # poetry
+        uv
+        # poetry
 
-      utm
+        utm
 
-      silicon
+        silicon
 
-      nu_scripts
-      # tracy-glfw
-      # tracy
+        nu_scripts
+        # tracy-glfw
+        # tracy
 
-      # cmake
-      # freetype
-      # glfw
-      # pkg-config
-      fontconfig
-      nerd-fonts.fira-code
-      fira-sans
+        # cmake
+        # freetype
+        # glfw
+        # pkg-config
+        fontconfig
+        nerd-fonts.fira-code
+        fira-sans
 
+        jc
+        nodejs_24
+        pnpm
+        python312Packages.grip
+        emacsclient-commands
 
-      jc
-      nodejs_24
-      pnpm
-      python312Packages.grip
-      emacsclient-commands
+        wireshark
+        nmap
 
-      wireshark
-      nmap
+        zstd
 
-      raycast
-    ]);
+        raycast
+      ]);
     shell.enableShellIntegration = true;
     shell.enableNushellIntegration = true;
     sessionPath = [
@@ -186,7 +210,7 @@ in {
         ".#*"
       ];
       includes = [
-        { path = "${config.xdg.configHome}/git/secrets"; }
+        {path = "${config.xdg.configHome}/git/secrets";}
       ];
       settings = {
         core = {
@@ -207,13 +231,16 @@ in {
         };
       };
     };
+    difftastic = {
+      enable = true;
+    };
     #doom-emacs = {
     #  enable = true;
     #  doomDir = ./doom.d;
     #};
     emacs = {
       enable = true;
-      extraPackages = epkgs: [ epkgs.doom ];
+      extraPackages = epkgs: [epkgs.doom];
     };
     bat = {
       enable = true;
@@ -244,15 +271,15 @@ in {
         # pkgs.nushellPlugins.units
       ];
       extraConfig = ''
-      const NU_LIB_DIRS = [
-        ($nu.default-config-dir | path join 'scripts')
-        ($nu.default-config-dir | path join 'modules')
-        ($nu.default-config-dir | path join 'completions')
-        ${lib.getLib pkgs.nu_scripts}/share/nu_scripts/modules/
-      ];
-      source '${nu_scripts_file "sourced/typeof.nu"}'
-      use gitv2 gs
-      use jc
+        const NU_LIB_DIRS = [
+          ($nu.default-config-dir | path join 'scripts')
+          ($nu.default-config-dir | path join 'modules')
+          ($nu.default-config-dir | path join 'completions')
+          ${lib.getLib pkgs.nu_scripts}/share/nu_scripts/modules/
+        ];
+        source '${nu_scripts_file "sourced/typeof.nu"}'
+        use gitv2 gs
+        use jc
       '';
     };
     fzf = {
@@ -263,7 +290,13 @@ in {
     jujutsu = {
       enable = true;
       settings = {
-        # User info is in conf.d/secrets.toml (managed by activation script)
+        ui.diff-editor = ":builtin";
+        ui.diff-formatter = ["difft" "--color" "always" "$left" "$right"];
+        ui.pager = [(lib.getExe pkgs.bash) "-c" "exec \${PAGER:-${config.environment.variables.PAGER}}"];
+        # TODO: set up signing and config.isDesktop
+        # signing.backend  = mkIf config.isDesktop "ssh";
+        # signing.behavior = mkIf config.isDesktop "own";
+        # signing.key      = mkIf config.isDesktop "~/.ssh/id";
       };
     };
     #eza
@@ -302,8 +335,11 @@ in {
       mutableUserTasks = true;
       userSettings = {
         base_keymap = "Emacs";
+        buffer_font_family = "FiraCode Nerd Font Mono";
         vim_mode = true;
-        which_key = { enabled = true; };
+        which_key = {
+          enabled = true;
+        };
         terminal = {
           font_family = "FiraCode Nerd Font Mono";
           shell = {
@@ -311,6 +347,14 @@ in {
               program = lib.getExe pkgs.nushell;
               args = ["--login"];
               title_override = null;
+            };
+          };
+        };
+        languages = {
+          Nix = {
+            formatter.external = {
+              command = lib.getExe pkgs.alejandra;
+              arguments = ["--queit" "--"];
             };
           };
         };
@@ -358,4 +402,3 @@ in {
   # xdg.enable = true;
   home.stateVersion = "25.11";
 }
-
