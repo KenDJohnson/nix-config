@@ -295,7 +295,7 @@ in {
       settings = {
         ui.diff-editor = ":builtin";
         ui.diff-formatter = ["difft" "--color" "always" "$left" "$right"];
-        ui.pager = [(lib.getExe pkgs.bash) "-c" "exec \${PAGER:-${config.environment.variables.PAGER}}"];
+        # ui.pager = [(lib.getExe pkgs.bash) "-c" "exec \${PAGER:-${config.environment.variables.PAGER}}"];
         # TODO: set up signing and config.isDesktop
         # signing.backend  = mkIf config.isDesktop "ssh";
         # signing.behavior = mkIf config.isDesktop "own";
