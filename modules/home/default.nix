@@ -154,6 +154,8 @@ in {
         zstd
 
         raycast
+        gh
+        # element-desktop
       ]);
     shell.enableShellIntegration = true;
     shell.enableNushellIntegration = true;
@@ -161,6 +163,7 @@ in {
       (in-home ".cargo/bin")
       "${config.xdg.configHome}/emacs/bin"
       (in-home ".local/bin")
+      (in-home ".opencode/bin")
     ];
     sessionVariables = {
       PAGER = "less -RF";
@@ -175,8 +178,9 @@ in {
       cat = "bat";
       pat = "bat --plain";
       bathelp = "bat --plain --language=help";
+      ec = "${lib.getExe' config.programs.emacs.finalPackage "emacsclient"} --tty";
     };
-    #sessionSearchVariables = {
+    #sessionsearchvariables = {
     #  MANPATH = [
     #    "${config.home.profileDirectory}/share/man"
     #    "${config.xdg.configHome}/.local/share/man"
@@ -214,7 +218,6 @@ in {
       ];
       settings = {
         core = {
-          fsmonitor = true;
           editor = "emacsclient";
         };
         init = {

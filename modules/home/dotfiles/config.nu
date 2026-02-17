@@ -231,7 +231,23 @@ def git-root-dir []: nothing -> path {
     if $result.exit_code != 0 {
         error make -u { msg: "current directory is not a subdirectory of a git worktree" }
     } else {
-        $result.stdout
+        $result.stdout | str trim
+    }
+}
+
+def repo-name-from-url [url:string]: nothing -> string {
+    if ($url | str starts-with 'git@') {
+      $url | split row '/' | last | str replace ".git" ""
+    } else if ($url | str starts-with 'http') {
+      $url | url parse | get path | split row '/' | last | str replace ".git" ""
+    } else {
+      error make {
+          msg: $"unknown repo URL format",
+          label: {
+              text: "this URL",
+              span: (metadata $url).span,
+          }
+      }
     }
 }
 
@@ -245,21 +261,79 @@ def git-repo-name [
     if $remote.exit_code != 0 {
         error make -u { msg: "current directory is not a subdirectory of a git worktree" }
     } else {
-        $remote.stdout | lines | first | path basename | str replace --regex '\.git$' ''
+        let remote_url = $remote.stdout | lines | first | str trim
+        repo-name-from-url $remote_url
     }
 }
 
+# Get the name of the current git repo based on remote name
+def jj-repo-name [
+    remote: string = "origin"
+]: nothing -> string {
+    let remotes = ^jj git remote list | complete
+    if $remotes.exit_code != 0 {
+        error make -u { msg: "current directory is not a subdirectory of a jj workspace" }
+    } else {
+        let remote_url = $remotes.stdout
+            | lines
+            | each { split row " " }
+            | iter filter-map { if ($in.0 == $remote) { $in.1 } }
+            | first
+        repo-name-from-url $remote_url
+    }
+}
+
+def "cwd in-jj" []: nothing -> bool {
+    (^jj workspace root | complete | get exit_code) == 0
+}
+
+def "cwd in-git" []: nothing -> bool {
+    (^git rev-parse --show-toplevel | complete | get exit_code) == 0
+}
+
 do --env {
+
+    def repo-prompt-fmt [
+        base: path
+        reponame: string
+        branch?: string
+    ]: nothing -> string {
+        mut parts = []
+
+        let branch = if ($branch | is-not-empty) {
+            $"(char -u e725) ($branch)"
+        }
+
+        let repo_dir = $base | path basename
+        if $repo_dir == $reponame {
+            $parts ++= [$"(ansi cyan_bold)(char -u e702)($branch) "]
+        } else {
+            $parts ++= [$"(ansi cyan_bold)(char -u e702) ($reponame)($branch) "]
+        }
+
+
+        $parts ++= [($"(char -u f413) ($base | path basename)" | with-ansi light_yellow_bold)]
+        let subpath = pwd | path relative-to $base
+        if ($subpath | is-not-empty) {
+            # $" (char -u '2192') "
+            $parts ++= [($"(ansi magenta_bold) → (ansi reset)(ansi blue)($subpath)")]
+        }
+
+
+        $parts | str join $"(ansi reset)"
+    }
+
+    def jj-prompt-body []: nothing -> string {
+        repo-prompt-fmt (jj workspace root | str trim) (jj-repo-name)
+    }
+    def path-prompt-body []: nothing -> string {
+        $"(ansi cyan)(pwd | path shorten-home)(ansi reset)"
+    }
+
     def prompt-header [
         --left-char: string
     ]: nothing -> string {
         let code = $env.LAST_EXIT_CODE
-
-        let git_root = try {
-            git-root-dir
-        } catch {
-            ""
-        }
 
         let hostname = if ($env.SSH_CONNECTION? | is-not-empty) {
             let hostname = try {
@@ -272,37 +346,14 @@ do --env {
             ""
         }
 
-        let body = if ($git_root | is-not-empty) {
-            let reponame = try {
-                git-repo-name
-            } catch {
-                ""
-            }
-            let branch = try {
-                let b = ^git branch --show-current err> $null_device
-                $"(char -u e725) ($b) " | with-ansi light_green_bold
-            } catch {
-                ""
-            }
-            let short_basename = $git_root | path shorten-home | path basename | str trim --right
-            let repo = if $short_basename != $reponame {
-                $"(char -u e702) ($reponame) ($branch)" | with-ansi cyan_bold
-            }
-            let path = $"(char -u f413) ($short_basename)" | with-ansi light_yellow_bold
-
-            let subpath = try {
-                pwd | path relative-to $git_root | str trim --right
-            } catch {
-                ""
-            }
-            let subpath = if ($subpath | is-not-empty) {
-                # $" (char -u '2192') "
-                $"(ansi magenta_bold) → (ansi reset)(ansi blue)($subpath)"
-            }
-            $"($hostname)($repo)($path)($subpath)(ansi reset)"
+        let repo_body = if (cwd in-jj) {
+            repo-prompt-fmt (jj workspace root | str trim) (jj-repo-name)
+        } else if (cwd in-git) {
+            repo-prompt-fmt (git-root-dir) (^git branch --show-current err> $null_device | str trim)
         } else {
-            $"($hostname)(ansi cyan)(pwd | path shorten-home)(ansi reset)"
+            path-prompt-body
         }
+        let body = $"($hostname)($repo_body)"
 
         def make_prefix []: string -> string {
             $"┫($in)(ansi light_yellow_bold)┣"
@@ -384,6 +435,47 @@ def follow-link-path []: string -> list<path> {
             { out: $p }
         }
     } $initial
+}
+
+# Open a Nix REPL preloaded with this flake's Home Manager context.
+#
+# Predefines these values in the REPL:
+# - `cfg`: selected `darwinConfigurations."<host>"`
+# - `pkgs`: package set for the selected host
+# - `lib`: `pkgs.lib`
+# - `hm`: `cfg.config.home-manager.users."<user>"`
+# - `opts`: Home Manager user option schema (`home-manager.users` suboptions)
+#
+# Defaults:
+# - `--flake`: current directory (`.`)
+# - `--host`: current machine hostname
+# - `--user`: `$env.USER`
+#
+# Examples:
+# - `hm repl`
+# - `hm repl -H "Kens-MBP"`
+# - `hm repl -f ~/.config/nix-config -H "Kens-MBP" -u kjohnson`
+def "hm repl" [
+  --flake(-f): path
+  --host(-H): string
+  --user(-u): string
+] {
+  let flake_path = ($flake | default $env.NIX_CONFIG_DIR) | path expand
+  let host = ($host | default (hostname))
+  let user = ($user | default (whoami))
+  let expr = $"
+    let
+      flake = builtins.getFlake \"($flake_path)\";
+      cfg = flake.darwinConfigurations.\"($host)\";
+    in {
+      inherit cfg;
+      pkgs = cfg.pkgs;
+      lib = cfg.pkgs.lib;
+      hm = cfg.config.home-manager.users.\"($user)\";
+      opts = cfg.options.home-manager.users.type.getSubOptions [];
+    }"
+
+  ^nix repl --impure --expr $expr
 }
 
 source git.nu
