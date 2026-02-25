@@ -1,10 +1,19 @@
-{ lib, host, ... }:
+{ ... }:
 
 {
+  machineType = "personal";
+  machineRole = "desktop";
+  devTools = {
+    enable = true;
+    languages = { cpp = true; node = true; python = true; nix = true; rust = true; };
+    latex = true;
+  };
+  networkingTools = true;
+
   # Mac Mini: server-like behavior - prevent sleep but allow display off
   power.sleep = {
-    computer = "never";     # Never sleep (pmset sleep 0)
-    display = 15;           # Display off after 15 minutes
-    harddisk = "never";     # Keep disks awake (pmset disksleep 0)
+    computer = "never";
+    display = 15;
+    harddisk = "never";
   };
 }

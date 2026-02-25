@@ -3,7 +3,9 @@
     "allow": [
       "Bash(tree:*)",
       "WebFetch(domain:github.com)",
-      "Bash(git -C /private/etc/nix-darwin log --oneline -10)"
+      "Bash(git -C /private/etc/nix-darwin log --oneline -10)",
+      "Bash(jj status:*)",
+      "Bash(jj diff:*)"
     ]
   }
 }

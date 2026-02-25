@@ -12,29 +12,47 @@ in
     nix-darwin.lib.darwinSystem {
       system = hostConfig.system;
       modules = [
+        ../modules/machine.nix
         ../modules/darwin
         hostModule
         agenix.darwinModules.default
         home-manager.darwinModules.home-manager
-        {
+        ({ config, ... }: {
+          # Identity from hostConfig
+          nixpkgs.hostPlatform = hostConfig.system;
+          system.primaryUser = hostConfig.username;
+          users.users.${hostConfig.username} = {
+            name = hostConfig.username;
+            home = hostConfig.homeDirectory;
+          };
+          networking.hostName = hostConfig.hostname or null;
+
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.backupFileExtension = "backup";
           home-manager.users.${hostConfig.username} = {
             imports = [
+              ../modules/machine.nix
               ../modules/home
               agenix.homeManagerModules.default
             ];
+            # Propagate machine.nix values from darwin → HM
+            machineType = config.machineType;
+            machineRole = config.machineRole;
+            devTools = config.devTools;
+            networkingTools = config.networkingTools;
+            sshPersonalHosts = config.sshPersonalHosts;
+            # Identity
+            home.username = hostConfig.username;
+            home.homeDirectory = hostConfig.homeDirectory;
           };
           home-manager.extraSpecialArgs = {
             inherit inputs;
-            host = hostConfig;
           };
-        }
+        })
       ];
       specialArgs = {
         inherit inputs;
-        host = hostConfig;
       };
     };
 
@@ -45,12 +63,16 @@ in
         system = hostConfig.system;
       };
       modules = [
+        ../modules/machine.nix
         ../modules/home
         agenix.homeManagerModules.default
+        {
+          home.username = hostConfig.username;
+          home.homeDirectory = hostConfig.homeDirectory;
+        }
       ];
       extraSpecialArgs = {
         inherit inputs;
-        host = hostConfig;
       };
     };
 }

@@ -25,19 +25,15 @@
     hosts = {
       "Kens-Mac-mini" = {
         hostDir = "kens-mac-mini";
-        hostname = "Kens-Mac-mini";
         system = "aarch64-darwin";
         platform = "darwin";
-        systemType = "personal";
         username = "kjohnson";
         homeDirectory = "/Users/kjohnson";
       };
       "Kens-MBP" = {
         hostDir = "kens-mbp";
-        hostname = "Kens-MBP";
         system = "aarch64-darwin";
         platform = "darwin";
-        systemType = "personal";
         username = "kjohnson";
         homeDirectory = "/Users/kjohnson";
       };
@@ -57,10 +53,8 @@
       # "dev-vm" = lib.mkHomeConfig {
       #   hostConfig = {
       #     hostDir = "linux-vm";
-      #     hostname = "dev-vm";
       #     system = "x86_64-linux";
       #     platform = "linux";
-      #     systemType = "personal";
       #     username = "kjohnson";
       #     homeDirectory = "/home/kjohnson";
       #   };

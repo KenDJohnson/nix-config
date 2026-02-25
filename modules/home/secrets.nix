@@ -2,10 +2,9 @@
   config,
   lib,
   pkgs,
-  host,
   ...
 }: let
-  homeDir = host.homeDirectory;
+  homeDir = config.home.homeDirectory;
   secretsDir = ../../secrets;
 in {
   # Declare agenix secrets

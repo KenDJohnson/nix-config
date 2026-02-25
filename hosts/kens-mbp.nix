@@ -1,6 +1,12 @@
-{ lib, host, ... }:
+{ ... }:
 
 {
-  # MacBook Pro: let macOS manage power/sleep normally
-  # No power overrides - use system defaults
+  machineType = "personal";
+  machineRole = "desktop";
+  devTools = {
+    enable = true;
+    languages = { cpp = true; node = true; python = true; nix = true; rust = true; };
+    latex = true;
+  };
+  networkingTools = true;
 }

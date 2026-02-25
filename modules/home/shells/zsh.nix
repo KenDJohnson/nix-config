@@ -1,11 +1,11 @@
-{ config, lib, pkgs, host, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   zshConfDir = ".config/zsh";
   myFunctions = pkgs.stdenvNoCC.mkDerivation rec {
     name = "zsh-functions-${version}";
     version = "0.0.1";
-    src = ./functions;
+    src = ./zsh-functions;
     phases = [ "installPhase" ];
     installPhase = ''
       mkdir $out
@@ -28,7 +28,7 @@ in {
     shellAliases.ls = "ls --color=auto";
     shellAliases.ll = "ls -lahrts";
     shellAliases.nixswitch =
-        "sudo darwin-rebuild switch --flake /etc/nix-darwin/.#${host.hostname}";
+        "sudo darwin-rebuild switch --flake /etc/nix-darwin/.#$(hostname -s)";
     shellAliases.nixpkgup = "(cd /etc/nix-darwin/ && sudo nix flake update nixpkgs)";
 
     oh-my-zsh = {
