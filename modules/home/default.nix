@@ -10,5 +10,6 @@
     ./desktop.nix
     ./dev-tools.nix
     ./networking.nix
+    ./llm.nix
   ];
 }

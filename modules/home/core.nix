@@ -43,6 +43,7 @@ in {
         _1password-cli
         gnupg
         yubikey-manager
+        difftastic
       ]);
     shell.enableShellIntegration = true;
     shell.enableNushellIntegration = true;

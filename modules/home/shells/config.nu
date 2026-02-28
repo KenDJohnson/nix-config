@@ -313,7 +313,7 @@ do --env {
 
 
         $parts ++= [($"(char -u f413) ($base | path basename)" | with-ansi light_yellow_bold)]
-        let subpath = pwd | path relative-to $base
+        let subpath = pwd | path expand | path relative-to $base
         if ($subpath | is-not-empty) {
             # $" (char -u '2192') "
             $parts ++= [($"(ansi magenta_bold) → (ansi reset)(ansi blue)($subpath)")]
