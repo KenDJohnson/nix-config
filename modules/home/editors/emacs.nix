@@ -4,7 +4,7 @@ let
   doom-dir = "${homeDir}/.doom.d/";
 in {
   config = lib.mkMerge [
-    { programs.emacs.enable = lib.mkDefault config.programs.emacs.enable; }
+    { programs.emacs.enable = lib.mkDefault true; }
     (lib.mkIf config.programs.emacs.enable {
       programs.emacs.extraPackages = epkgs: [epkgs.doom];
       home = {
