@@ -45,26 +45,6 @@ in {
         yubikey-manager
         difftastic
       ]);
-    shell.enableShellIntegration = true;
-    shell.enableNushellIntegration = true;
-    sessionPath = [
-      (in-home ".cargo/bin")
-      "${config.xdg.configHome}/emacs/bin"
-      (in-home ".local/bin")
-      (in-home ".opencode/bin")
-    ];
-    sessionVariables = {
-      PAGER = "less -RF";
-      CLICOLOR = 1;
-    };
-    shellAliases = {
-      l = "ls -l";
-      cat = "bat";
-      pat = "bat --plain";
-      bathelp = "bat --plain --language=help";
-    } // lib.optionalAttrs config.programs.emacs.enable {
-      ec = "${lib.getExe' config.programs.emacs.finalPackage "emacsclient"} --tty";
-    };
     stateVersion = "25.11";
   };
 
