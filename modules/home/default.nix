@@ -9,6 +9,7 @@
     ./ghostty.nix
     ./desktop.nix
     ./dev-tools.nix
+    ./work.nix
     ./networking.nix
     ./llm.nix
   ];

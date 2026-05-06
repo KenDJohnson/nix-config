@@ -189,8 +189,16 @@ def --env mc [path: path]: nothing -> nothing {
   cd $path
 }
 
+def is-darwin []: nothing -> bool {
+    (sys host | get name) == "Darwin"
+}
+
 def full-hostname []: nothing -> string {
-  sys host | get hostname
+    if (is-darwin) {
+        scutil --get LocalHostName
+    } else {
+        sys host | get hostname
+    }
 }
 
 def hostname []: nothing -> string {
@@ -402,7 +410,12 @@ do --env {
 
 
 def nixswitch [] {
-  ^sudo darwin-rebuild switch --flake ($env.NIX_CONFIG_DIR | path join $".#(hostname)")
+  # ^sudo darwin-rebuild switch --flake ($env.NIX_CONFIG_DIR | path join $".#(^scutil --get LocalHostName)")
+  if (is-darwin) {
+    nh darwin switch --ask $env.NIX_CONFIG_DIR
+  } else {
+    nh home switch --ask $env.NIX_CONFIG_DIR
+  }
 }
 def "nixswitch doom" [] {
   nixswitch
@@ -478,7 +491,38 @@ def "hm repl" [
   ^nix repl --impure --expr $expr
 }
 
-source git.nu
-source cmds.nu
+def td [item: string]: nothing -> nothing {
+  $item | todo
+}
 
-use completions-jj.nu *
+def "td get" []: nothing -> string {
+  let file = (e '+org-capture-todo-file' | path expand)
+  cat $file
+}
+
+def "todo" []: string -> nothing {
+    let msg = $in
+    let res = e $"\(org-capture-string \"($in)\" \"c\"\)" | complete
+    if (($res.exit_code != 0) or (($res.stdout | str trim) != t)) {
+       error make {
+         msg: "could not capture TODO item",
+         labels: [{ text: "item", span: (metadata $msg).span }],
+         inner: [{msg: $res.stderr}]
+       }
+    }
+}
+
+def --wrapped codex-pro [...rest] {
+  $env.CODEX_HOME = $env.HOME | path join .codex-pro
+  ~/.local/bin/codex
+}
+
+def --wrapped codex-b [...rest] {
+  $env.CODEX_HOME = $env.HOME | path join .codex-business
+  ~/.local/bin/codex
+}
+
+# source git.nu
+# source cmds.nu
+
+# use completions-jj.nu *

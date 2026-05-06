@@ -41,6 +41,7 @@ in
             machineRole = config.machineRole;
             devTools = config.devTools;
             networkingTools = config.networkingTools;
+            codex = config.codex;
             sshPersonalHosts = config.sshPersonalHosts;
             # Identity
             home.username = hostConfig.username;

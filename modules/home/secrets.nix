@@ -7,7 +7,7 @@
   homeDir = config.home.homeDirectory;
   secretsDir = ../../secrets;
 in {
-  # Declare agenix secrets
+  # Declare shared agenix secrets
   age.secrets = {
     user-info = {
       file = "${secretsDir}/user-info.age";
@@ -16,6 +16,10 @@ in {
     ssh-hosts = {
       file = "${secretsDir}/ssh-hosts.age";
       path = "${config.home.homeDirectory}/.local/share/agenix/ssh-hosts";
+    };
+    mcp-tokens = {
+      file = "${secretsDir}/mcp-tokens.age";
+      path = "${config.home.homeDirectory}/.local/share/agenix/mcp-tokens";
     };
   };
 
@@ -59,6 +63,27 @@ in {
       EOF
               $DRY_RUN_CMD chmod 600 "${homeDir}/.ssh/config.d/secret-hosts"
             fi
+    '';
+
+    # Generate Codex MCP token environment files
+    generateCodexMcpTokenSecrets = lib.hm.dag.entryAfter ["writeBoundary" "agenix"] ''
+      mkdir -p "${config.xdg.configHome}/codex" "${config.xdg.configHome}/nushell"
+      codex_mcp_env="${config.xdg.configHome}/codex/mcp-tokens.env"
+      codex_mcp_nu_env="${config.xdg.configHome}/nushell/mcp-tokens.nu"
+
+      : > "$codex_mcp_env"
+      : > "$codex_mcp_nu_env"
+
+      if [ -f "${config.age.secrets.mcp-tokens.path}" ]; then
+        source "${config.age.secrets.mcp-tokens.path}"
+
+        if [ -n "''${LINEAR_MCP_ACCESS_TOKEN:-}" ]; then
+          printf 'export LINEAR_MCP_ACCESS_TOKEN=%q\n' "$LINEAR_MCP_ACCESS_TOKEN" > "$codex_mcp_env"
+          printf '$env.LINEAR_MCP_ACCESS_TOKEN = %s\n' "$("${lib.getExe pkgs.jq}" -Rn --arg value "$LINEAR_MCP_ACCESS_TOKEN" '$value')" > "$codex_mcp_nu_env"
+        fi
+      fi
+
+      $DRY_RUN_CMD chmod 600 "$codex_mcp_env" "$codex_mcp_nu_env"
     '';
 
     # Generate Doom Emacs secrets.el

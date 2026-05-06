@@ -6,7 +6,7 @@ in {
   config = lib.mkMerge [
     { programs.emacs.enable = lib.mkDefault true; }
     (lib.mkIf config.programs.emacs.enable {
-      programs.emacs.extraPackages = epkgs: [epkgs.doom];
+      # programs.emacs.extraPackages = epkgs: [epkgs.doom];
       home = {
         packages = [ pkgs.emacsclient-commands ];
         file.doom = {

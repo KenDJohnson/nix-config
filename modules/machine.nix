@@ -25,6 +25,7 @@ in
       latex = mkEnableOption "LaTeX (texlive + ghostscript)";
     };
     networkingTools = mkEnableOption "Network tools (wireshark, nmap, ffmpeg)";
+    codex.enable = mkEnableOption "OpenAI Codex CLI";
     sshPersonalHosts = mkEnableOption "Personal/homelab SSH hosts" // {
       default = config.machineType == "personal";
     };

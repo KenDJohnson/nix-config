@@ -37,6 +37,14 @@
         username = "kjohnson";
         homeDirectory = "/Users/kjohnson";
       };
+      # OCX laptop
+      "Kens-MacBook-Pro" = {
+        hostDir = "ocx-mbp";
+        system = "aarch64-darwin";
+        platform = "darwin";
+        username = "ken";
+        homeDirectory = "/Users/ken";
+      };
     };
 
     darwinHosts = nixpkgs.lib.filterAttrs

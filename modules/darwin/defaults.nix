@@ -13,10 +13,13 @@
         persistent-apps = [
           "/Applications/Google Chrome.app"
           "${homeDir}/Applications/Home Manager Apps/Emacs.app"
-          "${homeDir}/Applications/Home Manager Apps/Zed.app"
           "${homeDir}/Applications/Home Manager Apps/Ghostty.app"
+          "/Applications/ChatGPT.app"
+          "/Applications/Codex.app"
+          "/Applications/1Password.app"
         ] ++ lib.optionals (config.machineType == "work") [
           "/Applications/Slack.app"
+          "/Applications/Tailscale.app"
         ] ++ [
           "${homeDir}/Applications/Home Manager Apps/imhex.app"
         ] ++ lib.optionals (config.machineType == "work") [

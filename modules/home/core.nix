@@ -15,7 +15,17 @@ in {
     ];
   };
 
+  targets.darwin = lib.mkIf pkgs.stdenv.isDarwin {
+    # Home Manager's copied app bundles can invalidate Ghostty's launch
+    # constraints on macOS 26. Keep apps symlinked to their Nix store bundles.
+    copyApps.enable = false;
+    linkApps.enable = true;
+  };
+
   home = {
+    file = lib.mkIf pkgs.stdenv.isDarwin {
+      "Applications/Home Manager Apps".force = true;
+    };
     packages =
       [
         inputs.ragenix.packages.${pkgs.stdenv.hostPlatform.system}.default
@@ -30,7 +40,6 @@ in {
         wget
         jc
         coreutils
-        direnv
         btop
         tokei
         zstd
@@ -44,6 +53,9 @@ in {
         gnupg
         yubikey-manager
         difftastic
+        dix
+        zellij
+        gitleaks
       ]);
     stateVersion = "25.11";
   };
@@ -61,9 +73,21 @@ in {
       enable = true;
       generateCaches = true;
     };
+    nh = {
+      enable = true;
+    } // lib.optionalAttrs pkgs.stdenv.isDarwin {
+      darwinFlake = "/etc/nix-darwin";
+    };
     fzf = {
       enable = true;
       enableZshIntegration = true;
+    };
+    direnv = {
+      enable = true;
+      enableNushellIntegration = true;
+      config = {
+        global.hide_env_diff = true;
+      };
     };
     jq.enable = true;
   };
@@ -73,5 +97,8 @@ in {
     enableNushellIntegration = true;
     enableBashIntegration = true;
     enableZshIntegration = true;
+  };
+  xdg = {
+    enable = true;
   };
 }

@@ -17,6 +17,7 @@
           keybind = [
             "global:ctrl+shift+\\=toggle_quick_terminal"
           ];
+          theme = "One Half Dark";
         };
       };
     })

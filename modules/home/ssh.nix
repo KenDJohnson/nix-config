@@ -26,6 +26,7 @@ in
     ];
     matchBlocks = {
       github = (ssh-host { hostname = "github.com"; user = "git"; key = (in-home ".ssh/id_ed25519"); });
+               # // { extraOptions = { UseKeychain = "yes"; }; };
     } // lib.optionalAttrs config.sshPersonalHosts {
       udm = (ssh-host { hostname = "unifi"; });
       robit = (ssh-host { hostname = "robit"; });

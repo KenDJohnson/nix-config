@@ -7,6 +7,9 @@ in {
     ./zsh.nix
     ./nushell.nix
   ];
+  # programs.zellij = {
+  #   enable = true;
+  # };
   home.shell.enableShellIntegration = true;
   home.shell.enableNushellIntegration = true;
   home.sessionPath = [
@@ -18,6 +21,8 @@ in {
   home.sessionVariables = {
     PAGER = "less -RF";
     CLICOLOR = 1;
+  } // lib.optionalAttrs (config.machineType == "personal") {
+    TASK_DIR = "${config.home.homeDirectory}/tasks/home";
   };
   home.sessionSearchVariables = {
     MANPATH = [

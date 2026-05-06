@@ -29,7 +29,7 @@
 
 ;; which system am i on
 (defconst current-system-type
-  (if (string-prefix-p "TEN" (system-name))
+  (if (file-exists-p "~/.work-system")
       (intern "work")
     (intern "personal"))
   "Symbol for current system type. `work' or `personal'")
@@ -52,7 +52,7 @@ in any order. BODY... can contain single or multiple expressions."
 
 ;; Must be set before org loads!
 (defvar org-directory-personal "~/Library/Mobile Documents/com~apple~CloudDocs/org")
-(defvar org-directory-work "~/Documents/notes/")
+(defvar org-directory-work "~/tasks/work")
 (setq org-directory (with-system-type
                      :work org-directory-work
                      :personal org-directory-personal))
@@ -101,7 +101,7 @@ in any order. BODY... can contain single or multiple expressions."
 
 (with-system-type
  :work ((setq +org-capture-notes-file (work-org-file "notes.org")
-              +org-capture-todo-file (work-org-file "tasks.org")
+              +org-capture-todo-file (work-org-file "inbox.org")
               +org-capture-personal-notes-file (personal-org-file "notes.org")
               +org-capture-personal-todo-file (personal-org-file "tasks.org")))
  :personal ((setq +org-capture-notes-file (personal-org-file "personal.org")
@@ -179,10 +179,12 @@ in any order. BODY... can contain single or multiple expressions."
         org-ellipsis " ▾ "
         org-capture-templates '(("t" "Work todo" entry
                                  (file+headline +org-capture-todo-file "Inbox")
-                                 "* TODO %?\n%i\n%a" :prepend t)
-                                ("C" "Collab topic" entry
-                                 (file+headline +org-capture-todo-file "Collab")
-                                 "* TODO %? :collab:\n%i\n%a" :prepend t)
+                                 "* TODO %?\n%U\n%a" :prepend t)
+                                ("c" "CLI Work todo" entry
+                                 (file+headline +org-capture-todo-file "Inbox")
+                                 "* TODO %i\n%U"
+                                 :prepend t
+                                 :immediate-finish t)
                                 ("T" "Personal todo" entry
                                  (file+headline +org-capture-personal-todo-file "Inbox")
                                  "* TODO %?\n%i\n%a" :prepend t)
@@ -200,15 +202,15 @@ in any order. BODY... can contain single or multiple expressions."
                                 ("R" "Personal Reference" entry
                                  (file+headline +org-capture-personal-todo-file "Reference"))
                                 ("p" "Templates for projects")
-                                ("pt" "Project-local todo" entry
-                                 (file+headline +org-capture-project-todo-file "Inbox")
-                                 "* TODO %?\n%i\n%a" :prepend t)
-                                ("pn" "Project-local notes" entry
-                                 (file+headline +org-capture-project-notes-file "Inbox")
-                                 "* %U %?\n%i\n%a" :prepend t)
-                                ("pc" "Project-local changelog" entry
-                                 (file+headline +org-capture-project-changelog-file "Unreleased")
-                                 "* %U %?\n%i\n%a" :prepend t)
+                                ;; ("pt" "Project-local todo" entry
+                                ;;  (file+headline +org-capture-project-todo-file "Inbox")
+                                ;;  "* TODO %?\n%i\n%a" :prepend t)
+                                ;; ("pn" "Project-local notes" entry
+                                ;;  (file+headline +org-capture-project-notes-file "Inbox")
+                                ;;  "* %U %?\n%i\n%a" :prepend t)
+                                ;; ("pc" "Project-local changelog" entry
+                                ;;  (file+headline +org-capture-project-changelog-file "Unreleased")
+                                ;;  "* %U %?\n%i\n%a" :prepend t)
                                 ("o" "Centralized templates for projects")
                                 ("ot" "Project todo" entry #'+org-capture-central-project-todo-file "* TODO %?\n %i\n %a" :heading "Tasks" :prepend nil)
                                 ("on" "Project notes" entry #'+org-capture-central-project-notes-file "* %U %?\n %i\n %a" :heading "Notes" :prepend t)
