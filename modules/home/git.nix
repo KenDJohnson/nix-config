@@ -24,6 +24,14 @@
         push.autoSetupRemote = true;
         rerere.enabled = true;
         diff.algorithm = "patience";
+        alias = {
+          dlog = "-c diff.external=${lib.getExe pkgs.difftastic} log --ext-diff";
+          dl = "-c diff.external=${lib.getExe pkgs.difftastic} log --ext-diff";
+          dshow = "-c diff.external=${lib.getExe pkgs.difftastic} show --ext-diff";
+          ds = "-c diff.external=${lib.getExe pkgs.difftastic} show --ext-diff";
+          ddiff = "-c diff.external=${lib.getExe pkgs.difftastic} diff";
+          dft = "-c diff.external=${lib.getExe pkgs.difftastic} diff";
+        };
       };
     };
     difftastic.enable = true;

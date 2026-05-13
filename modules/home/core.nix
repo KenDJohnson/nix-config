@@ -87,6 +87,7 @@ in {
       enableNushellIntegration = true;
       config = {
         global.hide_env_diff = true;
+        whitelist.prefix = ["~/work"];
       };
     };
     jq.enable = true;

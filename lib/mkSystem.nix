@@ -16,8 +16,27 @@ in
         ../modules/darwin
         hostModule
         agenix.darwinModules.default
+        inputs.determinate.darwinModules.default
         home-manager.darwinModules.home-manager
         ({ config, ... }: {
+          determinateNix = {
+            enable = true;
+            customSettings = {
+              # enable parallel evaluation
+              eval-cores = 0;
+              show-trace = true;
+              warn-dirty = false;
+              # TODO potentially enable
+              # sandbox = true;
+              # extra-sandbox-paths = [];
+              trusted-users = [ "@admin" ];
+              extra-experimental-features = [ "pipe-operators" ];
+            };
+            determinateNixd = {
+              garbageCollector.strategy = "automatic";
+              builder.state = "enabled";
+            };
+          };
           # Identity from hostConfig
           nixpkgs.hostPlatform = hostConfig.system;
           system.primaryUser = hostConfig.username;

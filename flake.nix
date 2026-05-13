@@ -1,10 +1,19 @@
 {
   description = "Ken nix-darwin system flake";
 
+  # nixConfig = {
+  #   experimental-features = [
+  #     "nix-command"
+  #     "flakes"
+  #     "pipe-operators"
+  #   ];
+  # };
+
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin.url = "github:nix-darwin/nix-darwin/master";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
 
     home-manager.url = "github:nix-community/home-manager/master";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";

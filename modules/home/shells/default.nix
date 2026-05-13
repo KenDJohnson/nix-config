@@ -17,12 +17,16 @@ in {
     "${config.xdg.configHome}/emacs/bin"
     "${config.home.homeDirectory}/.local/bin"
     "${config.home.homeDirectory}/.opencode/bin"
+  ] ++ lib.optionals (pkgs.stdenv.isDarwin && config.machineRole == "desktop") [
+    "/Applications/cmux.app/Contents/MacOS/"
   ];
   home.sessionVariables = {
     PAGER = "less -RF";
     CLICOLOR = 1;
   } // lib.optionalAttrs (config.machineType == "personal") {
     TASK_DIR = "${config.home.homeDirectory}/tasks/home";
+  } // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
+    NIX_CONFIG_DIR = "/etc/nix-darwin";
   };
   home.sessionSearchVariables = {
     MANPATH = [
