@@ -540,6 +540,10 @@ in any order. BODY... can contain single or multiple expressions."
   (setq nix-nixfmt-bin "alejandra"
         lsp-nix-nil-formatter ["alejandra"]))
 
+(after! terraform-mode
+  (setq terraform-format-on-save nil)
+  (add-hook 'terraform-mode-hook #'lsp-deferred))
+
 (use-package! llvm-mode
   :defer t
   :config
@@ -572,3 +576,9 @@ in any order. BODY... can contain single or multiple expressions."
 
 (use-package! hoon-mode
   :defer t)
+
+(use-package! gterm
+  :defer t
+  :init
+  (setq gterm-always-compile-module t
+        gterm-shell "nushell"))
