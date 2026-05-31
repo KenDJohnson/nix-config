@@ -274,25 +274,28 @@ def git-repo-name [
     }
 }
 
-# Get the name of the current git repo based on remote name
 def jj-repo-name [
     remote: string = "origin"
 ]: nothing -> string {
-    let remotes = ^jj git remote list | complete
+    let remotes = ^jj --ignore-working-copy git remote list | complete
     if $remotes.exit_code != 0 {
         error make -u { msg: "current directory is not a subdirectory of a jj workspace" }
+    }
+
+    let remote_urls = $remotes.stdout
+        | lines
+        | each { split row " " }
+        | iter filter-map { if ($in.0 == $remote) { $in.1 } }
+
+    if ($remote_urls | is-empty) {
+        ^jj --ignore-working-copy workspace root | str trim | path basename
     } else {
-        let remote_url = $remotes.stdout
-            | lines
-            | each { split row " " }
-            | iter filter-map { if ($in.0 == $remote) { $in.1 } }
-            | first
-        repo-name-from-url $remote_url
+        repo-name-from-url ($remote_urls | first)
     }
 }
 
 def "cwd in-jj" []: nothing -> bool {
-    (^jj workspace root | complete | get exit_code) == 0
+    (^jj --ignore-working-copy workspace root | complete | get exit_code) == 0
 }
 
 def "cwd in-git" []: nothing -> bool {
@@ -332,7 +335,7 @@ do --env {
     }
 
     def jj-prompt-body []: nothing -> string {
-        repo-prompt-fmt (jj workspace root | str trim) (jj-repo-name)
+        repo-prompt-fmt (^jj --ignore-working-copy workspace root | str trim) (jj-repo-name)
     }
     def path-prompt-body []: nothing -> string {
         $"(ansi cyan)(pwd | path shorten-home)(ansi reset)"
@@ -355,7 +358,7 @@ do --env {
         }
 
         let repo_body = if (cwd in-jj) {
-            repo-prompt-fmt (jj workspace root | str trim) (jj-repo-name)
+            repo-prompt-fmt (^jj --ignore-working-copy workspace root | str trim) (jj-repo-name)
         } else if (cwd in-git) {
             repo-prompt-fmt (git-root-dir) (^git branch --show-current err> $null_device | str trim)
         } else {
