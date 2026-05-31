@@ -11,11 +11,24 @@
   baseNushellEnv = {
     SHELL = lib.getExe pkgs.nushell;
   };
-  variableValues = config.home.sessionVariables // baseNushellEnv // {
-    HOME = config.home.homeDirectory;
-    USER = config.home.username;
-  };
-  variablesMap = listToAttrs (flatten (mapAttrsToList (name: value: [ { name = "\$${name}"; value = toString value; } { name = "\${${name}}"; value = toString value; } ]) variableValues));
+  variableValues =
+    config.home.sessionVariables
+    // baseNushellEnv
+    // {
+      HOME = config.home.homeDirectory;
+      USER = config.home.username;
+    };
+  variablesMap = listToAttrs (flatten (mapAttrsToList (name: value: [
+      {
+        name = "\$${name}";
+        value = toString value;
+      }
+      {
+        name = "\${${name}}";
+        value = toString value;
+      }
+    ])
+    variableValues));
   expandVariables = value: replaceStrings (attrNames variablesMap) (attrValues variablesMap) (toString value);
   scalarEnv = filterAttrs (name: _: name != "TERM") (mapAttrs (_: expandVariables) (osConfig.environment.variables // config.home.sessionVariables // baseNushellEnv));
   prependSearchVariable = name: values: ''
@@ -91,6 +104,9 @@ in {
         use jc
 
         source cmds.nu
+      ''
+      + lib.optionalString (config.machineType == "work") ''
+        source work.nu
       ''
       + (mkCompletions [
         "bat"

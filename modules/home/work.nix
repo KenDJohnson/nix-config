@@ -11,7 +11,19 @@
     };
 
     home.packages = with pkgs; [
+      # cmake
+      # gnumake
+      # gnused
+      # jdk
+      # nodejs
+      # openssh
+      # openssl
+      # pkg-config
+      # pre-commit
+      # stdenv.cc
+      # zlib
       google-cloud-sdk
+      # bazelisk
     ];
 
     home.activation.generateWorkIdentitySecrets = lib.hm.dag.entryAfter ["writeBoundary" "agenix"] ''

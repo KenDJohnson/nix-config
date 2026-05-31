@@ -1,14 +1,10 @@
-{ inputs }:
-
-let
+{inputs}: let
   inherit (inputs) nixpkgs nix-darwin home-manager agenix ragenix;
-in
-{
+in {
   # Create a nix-darwin system configuration
-  mkDarwinHost = { hostConfig }:
-    let
-      hostModule = ../hosts/${hostConfig.hostDir}.nix;
-    in
+  mkDarwinHost = {hostConfig}: let
+    hostModule = ../hosts/${hostConfig.hostDir}.nix;
+  in
     nix-darwin.lib.darwinSystem {
       system = hostConfig.system;
       modules = [
@@ -18,7 +14,7 @@ in
         agenix.darwinModules.default
         inputs.determinate.darwinModules.default
         home-manager.darwinModules.home-manager
-        ({ config, ... }: {
+        ({config, ...}: {
           determinateNix = {
             enable = true;
             customSettings = {
@@ -29,8 +25,8 @@ in
               # TODO potentially enable
               # sandbox = true;
               # extra-sandbox-paths = [];
-              trusted-users = [ "@admin" ];
-              extra-experimental-features = [ "pipe-operators" ];
+              trusted-users = ["@admin"];
+              extra-experimental-features = ["pipe-operators"];
             };
             determinateNixd = {
               garbageCollector.strategy = "automatic";
@@ -61,6 +57,7 @@ in
             devTools = config.devTools;
             networkingTools = config.networkingTools;
             codex = config.codex;
+            tmux = config.tmux;
             sshPersonalHosts = config.sshPersonalHosts;
             # Identity
             home.username = hostConfig.username;
@@ -77,7 +74,7 @@ in
     };
 
   # Create a standalone home-manager configuration (for Linux)
-  mkHomeConfig = { hostConfig }:
+  mkHomeConfig = {hostConfig}:
     home-manager.lib.homeManagerConfiguration {
       pkgs = import nixpkgs {
         system = hostConfig.system;
