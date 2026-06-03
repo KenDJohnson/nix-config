@@ -106,7 +106,10 @@ in {
         source cmds.nu
       ''
       + lib.optionalString (config.machineType == "work") ''
-        source work.nu
+        const work_nu = "${nu_dir "work.nu"}"
+        source (if ($work_nu | path exists) { $work_nu } else { null })
+        const work_staging_nu = "${nu_dir "work-staging.nu"}"
+        source (if ($work_staging_nu | path exists) { $work_staging_nu } else { null })
       ''
       + (mkCompletions [
         "bat"

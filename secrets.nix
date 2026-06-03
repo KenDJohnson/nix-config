@@ -16,4 +16,5 @@ in {
   "secrets/ssh-hosts.age".publicKeys = allKeys;
   "secrets/mcp-tokens.age".publicKeys = allKeys;
   "modules/home/work-identity.age".publicKeys = work;
+  "modules/home/work.nu.age".publicKeys = work;
 }

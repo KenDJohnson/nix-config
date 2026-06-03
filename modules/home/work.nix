@@ -9,17 +9,21 @@
       file = ./work-identity.age;
       path = "${config.home.homeDirectory}/.local/share/agenix/work-identity";
     };
+    age.secrets.work-nu = {
+      file = ./work.nu.age;
+      path = "${config.programs.nushell.configDir}/work.nu";
+    };
 
     home.packages = with pkgs; [
-      # cmake
+      cmake
       # gnumake
       # gnused
-      # jdk
+      jdk
       # nodejs
       # openssh
       # openssl
       # pkg-config
-      # pre-commit
+      pre-commit
       # stdenv.cc
       # zlib
       google-cloud-sdk
