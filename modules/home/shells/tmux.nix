@@ -2,12 +2,15 @@
   config,
   lib,
   pkgs,
+  machineLib,
   ...
-}: {
+}: let
+  machine = machineLib.forConfig config;
+in {
   config = lib.mkIf config.tmux.enable {
     programs.tmux = {
       enable = true;
-      mouse = config.machineRole == "desktop";
+      mouse = machine.hasRole "desktop";
       prefix = "C-Space";
       shell = lib.getExe pkgs.nushell;
       plugins = with pkgs; [

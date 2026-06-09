@@ -2,12 +2,15 @@
   config,
   lib,
   pkgs,
+  machineLib,
   ...
-}: {
+}: let
+  machine = machineLib.forConfig config;
+in {
   config = lib.mkIf config.devTools.enable {
     home.packages = with pkgs;
       [shfmt shellcheck bash-language-server]
-      ++ lib.optionals (config.machineRole == "desktop") [pi-coding-agent]
+      ++ lib.optionals (machine.hasRole "desktop") [pi-coding-agent]
       ++ lib.optionals config.devTools.languages.nix [alejandra nil manix statix nix-search devenv]
       ++ lib.optionals config.devTools.languages.cpp [gnumake llvm clang libiconv]
       ++ lib.optionals config.devTools.languages.rust [capnproto capnproto-rust protobuf]

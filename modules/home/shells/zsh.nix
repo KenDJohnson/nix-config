@@ -2,8 +2,10 @@
   config,
   lib,
   pkgs,
+  machineLib,
   ...
 }: let
+  machine = machineLib.forConfig config;
   zshConfDir = ".config/zsh";
   myFunctions = pkgs.stdenvNoCC.mkDerivation rec {
     name = "zsh-functions-${version}";
@@ -45,7 +47,7 @@ in {
           source "${config.xdg.configHome}/codex/mcp-tokens.env"
         fi
       ''
-      + lib.optionalString (config.machineType == "work") ''
+      + lib.optionalString (machine.hasProfile "work") ''
         if [ -r "${config.xdg.configHome}/work/env.sh" ]; then
           source "${config.xdg.configHome}/work/env.sh"
         fi

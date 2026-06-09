@@ -2,9 +2,12 @@
   config,
   lib,
   pkgs,
+  machineLib,
   ...
-}: {
-  config = lib.mkIf (config.machineType == "work") {
+}: let
+  machine = machineLib.forConfig config;
+in {
+  config = machine.applyWork {
     age.secrets.work-identity = {
       file = ./work-identity.age;
       path = "${config.home.homeDirectory}/.local/share/agenix/work-identity";

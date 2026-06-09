@@ -1,5 +1,6 @@
 {inputs}: let
   inherit (inputs) nixpkgs nix-darwin home-manager agenix ragenix;
+  machineLib = import ./machineLib.nix {lib = nixpkgs.lib;};
 in {
   # Create a nix-darwin system configuration
   mkDarwinHost = {hostConfig}: let
@@ -52,8 +53,7 @@ in {
               agenix.homeManagerModules.default
             ];
             # Propagate machine.nix values from darwin → HM
-            machineType = config.machineType;
-            machineRole = config.machineRole;
+            machine = config.machine;
             devTools = config.devTools;
             networkingTools = config.networkingTools;
             codex = config.codex;
@@ -64,23 +64,26 @@ in {
             home.homeDirectory = hostConfig.homeDirectory;
           };
           home-manager.extraSpecialArgs = {
-            inherit inputs;
+            inherit inputs machineLib;
           };
         })
       ];
       specialArgs = {
-        inherit inputs;
+        inherit inputs machineLib;
       };
     };
 
   # Create a standalone home-manager configuration (for Linux)
-  mkHomeConfig = {hostConfig}:
+  mkHomeConfig = {hostConfig}: let
+    hostModule = ../hosts/${hostConfig.hostDir}.nix;
+  in
     home-manager.lib.homeManagerConfiguration {
       pkgs = import nixpkgs {
         system = hostConfig.system;
       };
       modules = [
         ../modules/machine.nix
+        hostModule
         ../modules/home
         agenix.homeManagerModules.default
         {
@@ -89,7 +92,7 @@ in {
         }
       ];
       extraSpecialArgs = {
-        inherit inputs;
+        inherit inputs machineLib;
       };
     };
 }

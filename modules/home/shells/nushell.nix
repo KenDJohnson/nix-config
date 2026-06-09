@@ -3,8 +3,10 @@
   lib,
   pkgs,
   osConfig,
+  machineLib,
   ...
 }: let
+  machine = machineLib.forConfig config;
   inherit (lib) attrNames attrValues concatLines filterAttrs flatten listToAttrs mapAttrs mapAttrsToList replaceStrings;
   toNu = lib.hm.nushell.toNushell {};
 
@@ -80,7 +82,7 @@ in {
         const codex_mcp_tokens_env = "${config.xdg.configHome}/nushell/mcp-tokens.nu"
         source-env (if ($codex_mcp_tokens_env | path exists) { $codex_mcp_tokens_env } else { null })
       ''
-      + lib.optionalString (config.machineType == "work") ''
+      + lib.optionalString (machine.hasProfile "work") ''
         const work_identity_env = "${config.xdg.configHome}/nushell/work-identity.nu"
         source-env (if ($work_identity_env | path exists) { $work_identity_env } else { null })
       '';
@@ -105,7 +107,7 @@ in {
 
         source cmds.nu
       ''
-      + lib.optionalString (config.machineType == "work") ''
+      + lib.optionalString (machine.hasProfile "work") ''
         const work_nu = "${nu_dir "work.nu"}"
         source (if ($work_nu | path exists) { $work_nu } else { null })
         const work_staging_nu = "${nu_dir "work-staging.nu"}"

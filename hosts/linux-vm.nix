@@ -1,10 +1,11 @@
-{ ... }:
-
-{
-  machineType = "personal";
-  machineRole = "server";
+{...}: {
+  machine.profiles.personal = true;
+  machine.roles.server = true;
   devTools = {
     enable = true;
-    languages = { nix = true; rust = true; };
+    languages = {
+      nix = true;
+      rust = true;
+    };
   };
 }

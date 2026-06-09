@@ -3,8 +3,10 @@
   lib,
   pkgs,
   osConfig,
+  machineLib,
   ...
 }: let
+  machine = machineLib.forConfig config;
   inherit (lib) attrNames attrValues concatLines filterAttrs flatten listToAttrs mapAttrs mapAttrsToList replaceStrings;
 
   ghosttyIntegration = lib.getOutput "shell_integration" pkgs.ghostty-bin;
@@ -38,7 +40,7 @@
     |> mapAttrsToList (name: value: "${name}=${value}");
 in {
   config = lib.mkMerge [
-    {programs.ghostty.enable = lib.mkDefault (config.machineRole == "desktop");}
+    {programs.ghostty.enable = lib.mkDefault (machine.hasRole "desktop");}
     (lib.mkIf config.programs.ghostty.enable {
       programs.ghostty = {
         enableZshIntegration = true;

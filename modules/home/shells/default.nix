@@ -2,8 +2,10 @@
   pkgs,
   lib,
   config,
+  machineLib,
   ...
 }: let
+  machine = machineLib.forConfig config;
   homeDir = config.home.homeDirectory;
   in-home = path: "${homeDir}/${path}";
 in {
@@ -24,7 +26,7 @@ in {
       "${config.home.homeDirectory}/.local/bin"
       "${config.home.homeDirectory}/.opencode/bin"
     ]
-    ++ lib.optionals (pkgs.stdenv.isDarwin && config.machineRole == "desktop") [
+    ++ lib.optionals (pkgs.stdenv.isDarwin && machine.hasRole "desktop") [
       "/Applications/cmux.app/Contents/MacOS/"
     ];
   home.sessionVariables =
@@ -32,7 +34,7 @@ in {
       PAGER = "less -RF";
       CLICOLOR = 1;
     }
-    // lib.optionalAttrs (config.machineType == "personal") {
+    // lib.optionalAttrs (machine.hasProfile "personal") {
       TASK_DIR = "${config.home.homeDirectory}/tasks/home";
     }
     // lib.optionalAttrs (pkgs.stdenv.isDarwin) {

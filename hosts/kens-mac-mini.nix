@@ -1,6 +1,6 @@
 {...}: {
-  machineType = "personal";
-  machineRole = "desktop";
+  machine.profiles.personal = true;
+  machine.roles.desktop = true;
   devTools = {
     enable = true;
     languages = {

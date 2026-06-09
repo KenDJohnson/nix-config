@@ -3,16 +3,21 @@
   lib,
   ...
 }: let
-  inherit (lib) mkOption mkEnableOption types;
+  inherit (lib) mkDefault mkEnableOption mkOption types;
+  has = attrs: name: attrs.${name} or false;
 in {
   options = {
-    machineType = mkOption {
-      type = types.enum ["personal" "work"];
-      default = "personal";
-    };
-    machineRole = mkOption {
-      type = types.enum ["desktop" "server"];
-      default = "desktop";
+    machine = {
+      profiles = mkOption {
+        type = types.attrsOf types.bool;
+        default = {};
+        description = "Named configuration profiles to apply to this machine.";
+      };
+      roles = mkOption {
+        type = types.attrsOf types.bool;
+        default = {};
+        description = "Named roles this machine serves.";
+      };
     };
 
     devTools = {
@@ -30,10 +35,8 @@ in {
     networkingTools = mkEnableOption "Network tools (wireshark, nmap, ffmpeg)";
     codex.enable = mkEnableOption "OpenAI Codex CLI";
     tmux.enable = mkEnableOption "tmux";
-    sshPersonalHosts =
-      mkEnableOption "Personal/homelab SSH hosts"
-      // {
-        default = config.machineType == "personal";
-      };
+    sshPersonalHosts = mkEnableOption "Personal/homelab SSH hosts";
   };
+
+  config.sshPersonalHosts = mkDefault (has config.machine.profiles "personal");
 }
