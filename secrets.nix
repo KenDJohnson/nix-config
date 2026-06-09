@@ -9,7 +9,7 @@ let
   Kens-Mac-mini = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOC4z3GE9cIzBQNEz1jw6EQbDkf83ivDVLka7sxo56A1";
   ocx-mbp = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKIB30zIkNwpLoK7zwnuJu3mlkbKk89L7rbJnq9wy2r5";
   systems = [Kens-MBP Kens-Mac-mini ocx-mbp];
-  work = [ken-ocx ocx-mbp];
+  work = [kjohnson-mbp ken-ocx ocx-mbp];
   allKeys = users ++ systems;
 in {
   "secrets/user-info.age".publicKeys = allKeys;
