@@ -115,7 +115,7 @@ in {
       ''
       + (mkCompletions [
         "bat"
-        "cargo"
+        # "cargo"
         "gh"
         # "git"
         "jj"
