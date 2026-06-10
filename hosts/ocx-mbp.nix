@@ -14,6 +14,7 @@
     latex = false;
   };
   codex.enable = true;
+  zed.enable = true;
   networkingTools = false;
   tmux.enable = true;
 }

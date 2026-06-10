@@ -1,6 +1,6 @@
 { config, lib, pkgs, ... }: {
   config = lib.mkMerge [
-    { programs.zed-editor.enable = lib.mkDefault false; }
+    { programs.zed-editor.enable = lib.mkDefault config.zed.enable; }
     (lib.mkIf config.programs.zed-editor.enable {
       programs.zed-editor = {
         extensions = [

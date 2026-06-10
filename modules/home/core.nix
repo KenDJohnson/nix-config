@@ -95,9 +95,6 @@ in {
 
   services.ssh-agent = {
     enable = true;
-    enableNushellIntegration = true;
-    enableBashIntegration = true;
-    enableZshIntegration = true;
   };
   xdg = {
     enable = true;

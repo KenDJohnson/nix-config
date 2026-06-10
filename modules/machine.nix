@@ -35,6 +35,7 @@ in {
     networkingTools = mkEnableOption "Network tools (wireshark, nmap, ffmpeg)";
     codex.enable = mkEnableOption "OpenAI Codex CLI";
     tmux.enable = mkEnableOption "tmux";
+    zed.enable = mkEnableOption "Zed editor";
     sshPersonalHosts = mkEnableOption "Personal/homelab SSH hosts";
   };
 
