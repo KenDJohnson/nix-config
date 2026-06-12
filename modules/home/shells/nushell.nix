@@ -122,7 +122,7 @@ in {
         "less"
         "make"
         "man"
-        "nix"
+        # "nix"
         "op"
         "pre-commit"
         "rg"

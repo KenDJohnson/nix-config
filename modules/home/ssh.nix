@@ -1,10 +1,10 @@
 { config, lib, pkgs, ... }:
 let
   in-home = path: "${config.home.homeDirectory}/${path}";
-  ssh-host = { hostname, user ? "root", port ? 22, key ? (in-home ".ssh/id_rsa") }: {
-    HostName = hostname;
-    User = user;
-    IdentityFile = key;
+  ssh-host = { HostName, ... }@args: {
+    HostName = HostName;
+    User = "root";
+    IdentityFile = (in-home ".ssh/id_rsa");
     Compression = true;
     AddKeysToAgent = "yes";
     ForwardAgent = false;
@@ -14,8 +14,8 @@ let
     ControlMaster = "no";
     ControlPath = in-home ".ssh/master-%r@%n:%p";
     ControlPersist = "no";
-    Port = port;
-  };
+    Port = 22;
+  } // args;
 in
 {
   programs.ssh = {
@@ -25,14 +25,20 @@ in
       "~/.ssh/config.d/secret-hosts"
     ];
     settings = {
-      github = (ssh-host { hostname = "github.com"; user = "git"; key = (in-home ".ssh/id_ed25519"); });
+      github = (ssh-host {
+        HostName = "github.com";
+        User = "git";
+        IdentityFile = (in-home ".ssh/id_ed25519");
+        ServerAliveInterval = 30;
+        ServerAliveCountMax = 20;
+      });
                # // { UseKeychain = "yes"; };
     } // lib.optionalAttrs config.sshPersonalHosts {
-      udm = (ssh-host { hostname = "unifi"; });
-      robit = (ssh-host { hostname = "robit"; });
-      pve = (ssh-host { hostname = "pve"; });
-      homeassistant = (ssh-host { hostname = "homeassistant.local"; });
-      ha-root = (ssh-host { hostname = "homeassistant.local"; port = 22222; });
+      udm = (ssh-host { HostName = "unifi"; });
+      robit = (ssh-host { HostName = "robit"; });
+      pve = (ssh-host { HostName = "pve"; });
+      homeassistant = (ssh-host { HostName = "homeassistant.local"; });
+      ha-root = (ssh-host { HostName = "homeassistant.local"; Port = 22222; });
     };
   };
 }
