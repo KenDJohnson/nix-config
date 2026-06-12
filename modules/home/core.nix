@@ -48,6 +48,8 @@ in {
         nu_scripts
         fontconfig
         nerd-fonts.fira-code
+        nerd-fonts.symbols-only
+        noto-fonts
         fira-sans
         _1password-cli
         gnupg

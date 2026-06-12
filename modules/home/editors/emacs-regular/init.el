@@ -15,6 +15,8 @@
 (defconst regular-emacs/cache-dir (expand-file-name "var/" user-emacs-directory))
 (defconst regular-emacs/doom-dir (expand-file-name "~/.doom.d/"))
 (defconst regular-emacs/treesit-grammar-dir "@treesitGrammars@")
+(defconst regular-emacs/nerd-icons-font-family "Symbols Nerd Font Mono")
+(defconst regular-emacs/symbol-font-family "Noto Sans Math")
 
 (dolist (dir (list regular-emacs/cache-dir
                    (expand-file-name "auto-save/" regular-emacs/cache-dir)
@@ -82,7 +84,12 @@
 (when (display-graphic-p)
   (set-face-attribute 'default nil :family "FiraCode Nerd Font" :height 120 :weight 'semi-light)
   (set-face-attribute 'fixed-pitch nil :family "FiraCode Nerd Font" :height 120 :weight 'semi-light)
-  (set-face-attribute 'variable-pitch nil :family "Fira Sans" :height 130))
+  (set-face-attribute 'variable-pitch nil :family "Fira Sans" :height 130)
+  (when (fboundp 'set-fontset-font)
+    (dolist (script '(symbol mathematical))
+      (set-fontset-font t script regular-emacs/symbol-font-family))
+    (dolist (range '((#xe000 . #xf8ff) (#xf0000 . #xfffff)))
+      (set-fontset-font t range regular-emacs/nerd-icons-font-family))))
 
 (when (eq system-type 'darwin)
   (setq mac-command-modifier 'meta
@@ -107,6 +114,10 @@
     (doom-themes-visual-bell-config))
   (when (fboundp 'doom-themes-org-config)
     (doom-themes-org-config)))
+
+(use-package nerd-icons
+  :config
+  (setq nerd-icons-font-family regular-emacs/nerd-icons-font-family))
 
 (use-package doom-modeline
   :custom
@@ -155,6 +166,16 @@
   :after corfu
   :config
   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+(setq prettify-symbols-unprettify-at-point 'right-edge)
+(defun regular-emacs/prettify-prog-symbols ()
+  "Use the same true/false symbols as Doom's +ligatures extra set."
+  (setq-local prettify-symbols-alist
+              (append '(("true" . "𝕋")
+                        ("false" . "𝔽"))
+                      prettify-symbols-alist))
+  (prettify-symbols-mode 1))
+(add-hook 'prog-mode-hook #'regular-emacs/prettify-prog-symbols)
 
 (setq evil-want-integration t
       evil-want-keybinding nil

@@ -8,6 +8,8 @@
 (setq doom-theme 'doom-one
       doom-font (font-spec :family "FiraCode Nerd Font" :size 12 :weight 'semi-light)
       doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13)
+      doom-symbol-font (font-spec :family "Noto Sans Math")
+      nerd-icons-font-family "Symbols Nerd Font Mono"
       display-line-numbers-type t)
 
 
