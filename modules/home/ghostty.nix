@@ -58,6 +58,8 @@ in {
           shell-integration = "nushell";
           keybind = [
             "global:ctrl+shift+\\=toggle_quick_terminal"
+            "super+arrow_up=unbind"
+            "super+arrow_up=jump_to_prompt:-1"
           ];
           theme = "One Half Dark";
           env =
