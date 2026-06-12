@@ -105,6 +105,7 @@ in {
         packages = [
           pkgs.emacsclient-commands
           pkgs.terraform-ls
+          pkgs.typescript-language-server
           emacs-regular
           emacs-regular-daemon
           emacsclient-regular
