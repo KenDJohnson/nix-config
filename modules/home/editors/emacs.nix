@@ -9,7 +9,7 @@
   regular-emacs-dir = "${config.xdg.configHome}/emacs-regular";
   emacs-package = pkgs.emacs;
   emacs-packages = pkgs.emacsPackagesFor emacs-package;
-  regular-treesit-grammars = emacs-packages.treesit-grammars.with-grammars (grammars:
+  treesit-grammars = emacs-packages.treesit-grammars.with-grammars (grammars:
     with grammars; [
       tree-sitter-bash
       tree-sitter-c
@@ -116,6 +116,26 @@ in {
             source = ../doom.d;
             target = doom-dir;
           };
+          doom-treesit-typescript-dylib = {
+            enable = true;
+            source = "${treesit-grammars}/lib/libtree-sitter-typescript.dylib";
+            target = "${config.xdg.configHome}/emacs/.local/etc/tree-sitter/libtree-sitter-typescript.dylib";
+          };
+          doom-treesit-typescript-so = {
+            enable = true;
+            source = "${treesit-grammars}/lib/libtree-sitter-typescript.dylib";
+            target = "${config.xdg.configHome}/emacs/.local/etc/tree-sitter/libtree-sitter-typescript.so";
+          };
+          doom-treesit-tsx-dylib = {
+            enable = true;
+            source = "${treesit-grammars}/lib/libtree-sitter-tsx.dylib";
+            target = "${config.xdg.configHome}/emacs/.local/etc/tree-sitter/libtree-sitter-tsx.dylib";
+          };
+          doom-treesit-tsx-so = {
+            enable = true;
+            source = "${treesit-grammars}/lib/libtree-sitter-tsx.dylib";
+            target = "${config.xdg.configHome}/emacs/.local/etc/tree-sitter/libtree-sitter-tsx.so";
+          };
           emacs-regular-early-init = {
             enable = true;
             source = ./emacs-regular/early-init.el;
@@ -124,7 +144,7 @@ in {
           emacs-regular-init = {
             enable = true;
             source = pkgs.replaceVars ./emacs-regular/init.el {
-              treesitGrammars = "${regular-treesit-grammars}/lib";
+              treesitGrammars = "${treesit-grammars}/lib";
             };
             target = "${regular-emacs-dir}/init.el";
           };
