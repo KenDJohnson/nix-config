@@ -6,12 +6,14 @@
   ...
 }: let
   machine = machineLib.forConfig config;
+  homeDir = config.users.users.${config.system.primaryUser}.home;
 in {
   system = {
     defaults = {
-      dock = let
-        homeDir = config.users.users.${config.system.primaryUser}.home;
-      in {
+      controlcenter = {
+        BatteryShowPercentage = true;
+      };
+      dock = {
         tilesize = 24;
         mru-spaces = false;
         wvous-bl-corner = 1;
@@ -46,12 +48,28 @@ in {
         "com.apple.swipescrolldirection" = false;
         AppleInterfaceStyle = "Dark";
         AppleShowAllExtensions = true;
+        NSAutomaticQuoteSubstitutionEnabled = false;
       };
       finder = {
         AppleShowAllExtensions = true;
+        AppleShowAllFiles = true;
+        ShowExternalHardDrivesOnDesktop = false;
+        ShowHardDrivesOnDesktop = false;
+        ShowMountedServersOnDesktop = false;
         ShowPathbar = true;
+        ShowRemovableMediaOnDesktop = false;
+        ShowStatusBar = true;
       };
-      screencapture.location = "~/Desktop/screenshots";
+      screencapture = {
+        include-date = true;
+        location = "${homeDir}/Desktop/screenshots";
+        target = "file";
+      };
+      trackpad = {
+        TrackpadCornerSecondaryClick = 2;
+        TrackpadPinch = true;
+        TrackpadRightClick = true;
+      };
     };
     keyboard = {
       enableKeyMapping = true;
