@@ -35,7 +35,33 @@
                 command = lib.getExe pkgs.alejandra;
                 arguments = ["--queit" "--"];
               };
+              language_servers = ["nil" "!nixd"];
             };
+            Rust = {
+              semantic_tokens = "full";
+            };
+          };
+          load_direnv = "direct";
+          lsp = {
+            nil = {
+              formatting.command = [(lib.getExe pkgs.alejandra) "--quiet" "--"];
+              flake = {
+                autoArchive = true;
+                autoEvalInputs = true;
+              };
+            };
+          };
+          preview_tabs = {
+            enabled = true;
+            enable_preview_from_project_panel = true;
+            enable_preview_from_file_finder = false;
+            enable_preview_from_multibuffer = false;
+            #enable_preview_multibuffer_from_code_navigation = true; # nondefault
+            enable_preview_file_from_code_navigation = true;
+            enable_keep_preview_on_code_navigation = true; # nondefault
+          };
+          search = {
+            regex = true;
           };
           ui_font_size = 16;
           buffer_font_size = 16;
