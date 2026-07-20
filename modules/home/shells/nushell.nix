@@ -106,6 +106,8 @@ in {
         use jc
 
         source cmds.nu
+        const config_staging = "${nu_dir "config-staging.nu"}"
+        source (if ($config_staging | path exists) { $config_staging } else { null })
       ''
       + lib.optionalString (machine.hasProfile "work") ''
         const work_nu = "${nu_dir "work.nu"}"
