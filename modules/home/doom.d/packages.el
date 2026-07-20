@@ -106,5 +106,3 @@
            :files (:defaults "*.json"))
   :pin "5369ecec3cd154628cb23cf80d65c007bd940c70")
 
-(package! gterm
-  :recipe (:host github :repo "rwc9u/emacs-libgterm" :files ("*")))
