@@ -54,11 +54,6 @@
 ;; (package! asana-api
 ;;   :recipe (:local-repo "asana-api" :build nil))
 
-(package! gptel
-  :recipe (:host github :repo "karthink/gptel")
-  :pin "3722942363b26befd35e9c259de3f42e9ed704a7")
-
-
 ;; javascript module broken without this
 (package! rjsx-mode)
 
@@ -106,3 +101,8 @@
            :files (:defaults "*.json"))
   :pin "5369ecec3cd154628cb23cf80d65c007bd940c70")
 
+;; BEGIN: agent-shell
+(package! shell-maker)
+(package! acp)
+(package! agent-shell)
+;; END: agent-shell

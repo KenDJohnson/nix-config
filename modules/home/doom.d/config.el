@@ -606,8 +606,56 @@ to SEGMENTS relative to the doom user dir, if SEGMENTS is a symlink."
 (use-package! hoon-mode
   :defer t)
 
-(use-package! gterm
-  :defer t
-  :init
-  (setq gterm-always-compile-module t
-        gterm-shell "nushell"))
+
+(defun local/tty-client-frame-setup ()
+  "Set up an emacsclient frame displayed on a terminal."
+  (unless (display-graphic-p)
+    ;; Frame-local: this does not affect existing graphical frames.
+    (set-frame-parameter nil 'menu-bar-lines 0)
+
+    (dolist (face '(mode-line mode-line-active-hook mode-line-inactive))
+      (when (facep face)
+        (set-face-attribute face (selected-frame)
+                            :box nil
+                            :overline nil)))
+    (redraw-frame)))
+
+(add-hook 'server-after-make-frame-hook
+          #'local/tty-client-frame-setup)
+
+
+(after! ghostel
+  (setq ghostel-shell '("nu" "--login")))
+
+(map!
+ :after ghostel
+ :map ghostel-mode-map
+ "s-<up>" #'ghostel-previous-prompt
+ "s-<down>" #'ghostel-next-prompt)
+
+(defun local/sexp-at-line (file-path line)
+  "Return the sexp in FILE-PATH at LINE."
+  (with-temp-buffer
+    (insert-file-contents file-path)
+    (goto-line line)
+    (end-of-line)
+    (sp-up-sexp)
+    (sexp-at-point)))
+
+
+;; BEGIN: agent-shell
+
+(require 'acp)
+(require 'agent-shell)
+(use-package! agent-shell
+  :config
+  (evil-define-key 'insert agent-shell-mode-map (kbd "RET") #'newline)
+  (evil-define-key 'normal agent-shell-mode-map (kbd "RET") #'comint-send-input)
+
+  (add-hook 'agent-shell-mode-hook #'ghostel-comint-mode)
+  (add-hook 'diff-mode-hook
+            (lambda ()
+              (when (string-match-p "\\*agent-shell-diff\\*" (buffer-name))
+                (evil-emacs-state)))))
+
+;; END: agent-shell
