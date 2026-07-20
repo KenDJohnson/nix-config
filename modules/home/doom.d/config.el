@@ -308,12 +308,6 @@ in any order. BODY... can contain single or multiple expressions."
   (setq centaur-tabs--buffer-show-groups t)
   (centaur-tabs-group-by-projectile-project))
 
-(defmacro local/open-file-cmd (file)
-  "Create a lambda command that opens FILE."
-  `(lambda ()
-     (interactive)
-     (find-file ,file)))
-
 ;;;; Rust config
 
 (after! rustic
@@ -552,29 +546,61 @@ in any order. BODY... can contain single or multiple expressions."
   (setq llvm-mode-indent-offset 2)
   (setq llvm-mode-label-offset 2))
 
-(use-package! silicon
-  :config
-  (setq silicon-default-theme "OneHalfDark"))
-(map! :after silicon
-      :map silicon-mode-map
-      :leader
-      :desc "Silicon code screenshot" :nv "cls" #'silicon-buffer-file-to-png)
+(when (locate-library "silicon")
+  (use-package! silicon
+    :config
+    (setq silicon-default-theme "OneHalfDark"))
+  (after! silicon
+    (map! :map silicon-mode-map
+          :leader
+          :desc "Silicon code screenshot" :nv "cls" #'silicon-buffer-file-to-png)))
 
+
+(defun local/nix-config-dir ()
+  "Finds the nix-darwin/home-manager config dir."
+  (or (getenv "NIX_CONFIG_DIR")
+      (if (eq system-type 'darwin)
+          "/etc/nix-darwin"
+        "/etc/nix")))
+
+(defun local/nix-config-file (&rest segments)
+  "Path to file made of SEGMENTS relative to nix config."
+  (apply #'doom-path (local/nix-config-dir) segments))
+
+(defun local/doom-source-file (&rest segments)
+  "Finds the non-symlink path (i.e. nix source, not symlink to nix store)
+to SEGMENTS relative to the doom user dir, if SEGMENTS is a symlink."
+  (let ((doom-file (apply #'doom-path doom-user-dir segments)))
+    (if (file-symlink-p doom-file)
+        (apply #'local/nix-config-file "modules/home/doom.d" segments)
+      doom-file)))
+
+(defmacro local/open-file-cmd (file)
+  "Create a lambda command that opens FILE."
+  `(lambda ()
+     (interactive)
+     (find-file ,file)))
+
+(defmacro local/browse-file-cmd (path)
+  "Create a command that opens Doom's file picker rooted at PATH."
+  `(lambda ()
+     (interactive)
+     (doom-project-browse ,path)))
 
 (map! :leader
-      :after silicon
       (:prefix ("l" . "custom local bindings")
                (:prefix ("c" . "config")
-                :desc "Open doom config.el" "c" (local/open-file-cmd (doom-path doom-user-dir "config.el"))
-                :desc "Open doom init.el" "i" (local/open-file-cmd (doom-path doom-user-dir "init.el"))
-                :desc "Open doom packages.el" "p" (local/open-file-cmd (doom-path doom-user-dir "packages.el"))
-                :desc "Open nix home-manager" "n" (local/open-file-cmd "~/.config/nix-darwin/modules/home-manager/default.nix"))
+                :desc "Open doom config.el" "c" (local/open-file-cmd (local/doom-source-file "config.el"))
+                :desc "Open doom init.el" "i" (local/open-file-cmd (local/doom-source-file "init.el"))
+                :desc "Open doom packages.el" "p" (local/open-file-cmd (local/doom-source-file "packages.el"))
+                :desc "Open nix home-manager file" "n" (local/browse-file-cmd (local/nix-config-file "modules/home/")))
                (:prefix ("t" . "tabs")
                 :desc "Toggle between file tabs and group tabs" "t" #'centaur-tabs-toggle-groups
                 :desc "Blacklist a buffer name prefix, to be hidden in tabs" "b" #'centaur-tabs-blacklist-prefix
                 :desc "Kill all buffers in the current tab group" "k" #'centaur-tabs-kill-all-buffers-in-current-group)
-               (:prefix ("s" . "silicon")
-                :desc "Silicon code screenshot" "s" #'silicon-buffer-file-to-png)))
+               ;; (:prefix ("s" . "silicon")
+               ;;  :desc "Silicon code screenshot" "s" #'silicon-buffer-file-to-png)
+               ))
 
 (use-package! hoon-mode
   :defer t)
