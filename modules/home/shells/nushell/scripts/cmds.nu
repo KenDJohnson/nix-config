@@ -71,7 +71,7 @@ def gh-release-asset-download-extract [
     let dl_dir = mktemp --directory
     let extract_path = $dl_dir | path join ($name | split row '.' | first)
     ^gh release -R $repo download $tag --pattern $name --output -
-        | ^tar -C $dl_dir -xf -
+        | ^tar -C $dl_dir -xzf -
     mv $extract_path $out
     rm -r $dl_dir
 }
