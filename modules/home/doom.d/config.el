@@ -533,8 +533,9 @@ in any order. BODY... can contain single or multiple expressions."
                                         ;(use-package! ox-zola)
 
 (after! (:and nix-mode lsp-mode)
-  (setq nix-nixfmt-bin "alejandra"
-        lsp-nix-nil-formatter ["alejandra"]))
+  (setq nix-nixfmt-bin "alejandra")
+  (set-formatter! 'alejandra '("alejandra" "--quiet") :modes '(nix-mode))
+  (setq-hook! 'nix-mode-hook +format-with-lsp nil))
 
 (after! terraform-mode
   (setq terraform-format-on-save nil)
