@@ -26,7 +26,6 @@ in {
             "${homeDir}/Applications/Home Manager Apps/Emacs.app"
             "${homeDir}/Applications/Home Manager Apps/Ghostty.app"
             "/Applications/ChatGPT.app"
-            "/Applications/Codex.app"
             "/Applications/1Password.app"
           ]
           ++ lib.optionals (machine.hasProfile "work") [
