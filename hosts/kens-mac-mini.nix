@@ -16,9 +16,13 @@
   networkingTools = true;
 
   # Mac Mini: server-like behavior - prevent sleep but allow display off
-  power.sleep = {
-    computer = "never";
-    display = 15;
-    harddisk = "never";
+  power = {
+    restartAfterFreeze = true;
+    restartAfterPowerFailure = true;
+    sleep = {
+      computer = "never";
+      display = 15;
+      harddisk = "never";
+    };
   };
 }
