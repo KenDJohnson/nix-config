@@ -1,5 +1,10 @@
-{ inputs, pkgs, lib, config, ... }:
-let
+{
+  inputs,
+  pkgs,
+  lib,
+  config,
+  ...
+}: let
   homeDir = config.home.homeDirectory;
   in-home = path: "${homeDir}/${path}";
 in {
@@ -29,6 +34,7 @@ in {
     packages =
       [
         inputs.ragenix.packages.${pkgs.stdenv.hostPlatform.system}.default
+        inputs.gws.packages.${pkgs.stdenv.hostPlatform.system}.default
       ]
       ++ (with pkgs; [
         curl
@@ -75,11 +81,13 @@ in {
       enable = true;
       generateCaches = true;
     };
-    nh = {
-      enable = true;
-    } // lib.optionalAttrs pkgs.stdenv.isDarwin {
-      darwinFlake = "/etc/nix-darwin";
-    };
+    nh =
+      {
+        enable = true;
+      }
+      // lib.optionalAttrs pkgs.stdenv.isDarwin {
+        darwinFlake = "/etc/nix-darwin";
+      };
     fzf = {
       enable = true;
       enableZshIntegration = true;

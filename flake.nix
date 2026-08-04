@@ -25,11 +25,22 @@
 
     ragenix.url = "github:yaxitech/ragenix";
     ragenix.inputs.nixpkgs.follows = "nixpkgs";
+
+    gws.url = "github:googleworkspace/cli";
+    gws.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = inputs@{ self, nix-darwin, nixpkgs, home-manager, agenix, ragenix, ... }:
-  let
-    lib = import ./lib/mkSystem.nix { inherit inputs; };
+  outputs = inputs @ {
+    self,
+    nix-darwin,
+    nixpkgs,
+    home-manager,
+    agenix,
+    ragenix,
+    gws,
+    ...
+  }: let
+    lib = import ./lib/mkSystem.nix {inherit inputs;};
 
     hosts = {
       "Kens-Mac-mini" = {
@@ -56,12 +67,14 @@
       };
     };
 
-    darwinHosts = nixpkgs.lib.filterAttrs
+    darwinHosts =
+      nixpkgs.lib.filterAttrs
       (name: cfg: cfg.platform == "darwin")
       hosts;
   in {
-    darwinConfigurations = builtins.mapAttrs
-      (name: hostConfig: lib.mkDarwinHost { inherit hostConfig; })
+    darwinConfigurations =
+      builtins.mapAttrs
+      (name: hostConfig: lib.mkDarwinHost {inherit hostConfig;})
       darwinHosts;
 
     # Standalone home-manager configurations for Linux

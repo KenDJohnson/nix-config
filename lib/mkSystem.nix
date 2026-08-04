@@ -1,5 +1,5 @@
 {inputs}: let
-  inherit (inputs) nixpkgs nix-darwin home-manager agenix ragenix;
+  inherit (inputs) nixpkgs nix-darwin home-manager agenix ragenix gws;
   machineLib = import ./machineLib.nix {lib = nixpkgs.lib;};
   overlays = [
     (final: prev: {
@@ -56,6 +56,7 @@ in {
             determinateNixd = {
               garbageCollector.strategy = "automatic";
               builder.state = "enabled";
+              builder.memoryBytes = nixpkgs.lib.mkDefault 8589934592;
             };
           };
           # Identity from hostConfig
