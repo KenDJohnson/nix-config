@@ -3,6 +3,28 @@
   machineLib = import ./machineLib.nix {lib = nixpkgs.lib;};
   overlays = [
     (final: prev: {
+      nockchain = let
+        rustToolchain =
+          (inputs.fenix.packages.${final.stdenv.hostPlatform.system}.toolchainOf {
+            channel = "nightly";
+            date = "2026-04-03";
+            sha256 = "sha256-WAg39aJqFUa71UYBIAPxIX9uriD11P6uGKAPNmxSNMo=";
+          }).withComponents
+          [
+            "cargo"
+            "rustc"
+          ];
+        rustPlatform = final.makeRustPlatform {
+          cargo = rustToolchain;
+          rustc = rustToolchain;
+        };
+      in
+        final.callPackage ../pkgs/nockchain.nix {
+          src = inputs.nockchain-src;
+          revision = inputs.nockchain-src.rev;
+          inherit rustPlatform;
+        };
+
       # dix 2.0.0 fails package tests on Darwin under /private/tmp.
       # Drop this once nixpkgs-unstable includes NixOS/nixpkgs#528621.
       dix = prev.dix.overrideAttrs (old: let

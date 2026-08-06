@@ -146,6 +146,27 @@
         "url": "https://install.determinate.systems/determinate-nixd/tag/v3.21.1/x86_64-linux"
       }
     },
+    "fenix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ],
+        "rust-analyzer-src": "rust-analyzer-src"
+      },
+      "locked": {
+        "lastModified": 1786005881,
+        "narHash": "sha256-Bj3VKIiwX1daO4vOIyAM507A65J0aaRSctc87kiT7H4=",
+        "owner": "nix-community",
+        "repo": "fenix",
+        "rev": "a7c3ef79859bf024cdc865a0ed8f14a4e3f31099",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "fenix",
+        "type": "github"
+      }
+    },
     "flake-compat": {
       "flake": false,
       "locked": {
@@ -427,6 +448,23 @@
         "type": "github"
       }
     },
+    "nockchain-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785432425,
+        "narHash": "sha256-tqDAAviHp8tUKMJKVbzT2atKYIy6dkZOfG0t+YJPT1Y=",
+        "owner": "zorp-corp",
+        "repo": "nockchain",
+        "rev": "86a4a5bbd9b7dd27fecd1fa1c9c94b85277d6123",
+        "type": "github"
+      },
+      "original": {
+        "owner": "zorp-corp",
+        "repo": "nockchain",
+        "rev": "86a4a5bbd9b7dd27fecd1fa1c9c94b85277d6123",
+        "type": "github"
+      }
+    },
     "ragenix": {
       "inputs": {
         "agenix": "agenix_2",
@@ -455,11 +493,30 @@
       "inputs": {
         "agenix": "agenix",
         "determinate": "determinate",
+        "fenix": "fenix",
         "gws": "gws",
         "home-manager": "home-manager",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs_3",
+        "nockchain-src": "nockchain-src",
         "ragenix": "ragenix"
+      }
+    },
+    "rust-analyzer-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1785960076,
+        "narHash": "sha256-+Xej+akyhjZIFnsEIZLO3c6YNvlnKB3rFMzsprQCyDM=",
+        "owner": "rust-lang",
+        "repo": "rust-analyzer",
+        "rev": "cf3b451f47c01d76989425d1ace3f1cba70f1fdb",
+        "type": "github"
+      },
+      "original": {
+        "owner": "rust-lang",
+        "ref": "nightly",
+        "repo": "rust-analyzer",
+        "type": "github"
       }
     },
     "rust-overlay": {

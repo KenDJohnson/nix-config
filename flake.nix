@@ -15,6 +15,16 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
 
+    fenix = {
+      url = "github:nix-community/fenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    nockchain-src = {
+      url = "github:zorp-corp/nockchain/86a4a5bbd9b7dd27fecd1fa1c9c94b85277d6123";
+      flake = false;
+    };
+
     home-manager.url = "github:nix-community/home-manager/master";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
