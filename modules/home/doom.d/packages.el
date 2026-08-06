@@ -106,3 +106,8 @@
 (package! acp)
 (package! agent-shell)
 ;; END: agent-shell
+
+(package! auth-source-1password
+  :recipe (:host github
+           :repo "dlobraico/auth-source-1password")
+  :pin "10961bdc8a3ed551dde29fde416843058bea2374")

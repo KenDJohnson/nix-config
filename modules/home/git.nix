@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }: {
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}: {
   programs = {
     git = {
       enable = true;
@@ -14,9 +19,10 @@
         "*~"
         "*#"
         ".#*"
+        ".agent-shell/"
       ];
       includes = [
-        { path = "${config.xdg.configHome}/git/secrets"; }
+        {path = "${config.xdg.configHome}/git/secrets";}
       ];
       settings = {
         core.editor = "emacsclient";
@@ -24,6 +30,7 @@
         push.autoSetupRemote = true;
         rerere.enabled = true;
         diff.algorithm = "patience";
+        github.user = "KenDJohnson";
         alias = {
           dlog = "-c diff.external=${lib.getExe pkgs.difftastic} log --ext-diff";
           dl = "-c diff.external=${lib.getExe pkgs.difftastic} log --ext-diff";

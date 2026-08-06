@@ -47,8 +47,6 @@
   systemPath = osConfig.environment.systemPath |> expandVariables |> lib.splitString ":" |> toNu;
 
   nu_scripts_file = path: "${lib.getLib pkgs.nu_scripts}/share/nu_scripts/${path}";
-  nu_completion = name: (nu_scripts_file "custom-completions/${name}/${name}-completions.nu");
-  mkCompletions = cmds: let stmts = map (c: "use ${nu_completion c} *") cmds; in lib.join "\n" stmts;
   nu_dir = path: "${config.programs.nushell.configDir}/${path}";
   pluginRegistryPath = nu_dir "plugin.msgpackz";
   nixPluginRegistry = config.home.file."${pluginRegistryPath}".source;
@@ -99,7 +97,6 @@ in {
         const NU_LIB_DIRS = [
           ($nu.default-config-dir | path join 'scripts')
           ($nu.default-config-dir | path join 'modules')
-          ($nu.default-config-dir | path join 'completions')
           ${lib.getLib pkgs.nu_scripts}/share/nu_scripts/modules/
           ${ghosttyIntegration.outPath}/nushell/vendor/autoload
         ];
@@ -116,25 +113,7 @@ in {
         source (if ($work_nu | path exists) { $work_nu } else { null })
         const work_staging_nu = "${nu_dir "work-staging.nu"}"
         source (if ($work_staging_nu | path exists) { $work_staging_nu } else { null })
-      ''
-      + (mkCompletions [
-        "bat"
-        # "cargo"
-        "gh"
-        # "git"
-        "jj"
-        "less"
-        "make"
-        "man"
-        # "nix"
-        "op"
-        "pre-commit"
-        "rg"
-        "ssh"
-        "tar"
-        "uv"
-        # "zellij"
-      ]);
+      '';
   };
   # Keep Home Manager's generated registry as the declarative baseline, but
   # install a writable copy so `plugin add` can update it at runtime.

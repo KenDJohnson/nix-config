@@ -236,6 +236,8 @@ in any order. BODY... can contain single or multiple expressions."
 
 (use-package! lsp-mode
   :defer t
+  :config
+  (setq lsp-file-watch-threshold 5000)
   :custom
   (lsp-completion-provider :none)
   :init
@@ -625,7 +627,29 @@ to SEGMENTS relative to the doom user dir, if SEGMENTS is a symlink."
 
 
 (after! ghostel
-  (setq ghostel-shell '("nu" "--login")))
+  (setq ghostel-shell '("nu" "--login"))
+    ;;;###autoload
+  (defun local/ghostel-omp (&optional arg)
+    "Toggle a persistent omp popup window at project root.
+
+    If prefix ARG is non-nil, run omp --resume.
+
+    Returns the ghostel buffer."
+    (interactive "P")
+    (dlet ((default-directory (or (doom-project-root) default-directory)))
+      (dlet ((ghostel-buffer-name (+ghostel--buffer-name "doom:" "-omp" t))
+             confirm-kill-processes
+             current-prefix-arg)
+        (let ((omp-command (if arg "omp --resume\n" "omp\n"))
+              (buffer-exists (when (ghostel--find-buffer-by-identity ghostel-buffer-name) t)))
+          (if-let* ((win (get-buffer-window ghostel-buffer-name)))
+              (delete-window win)
+            (with-current-buffer (ghostel)
+              (set-window-dedicated-p (get-buffer-window) t)
+              (when buffer-exists
+                (ghostel-send-string omp-command))
+              (current-buffer)))))))
+  )
 
 (map!
  :after ghostel
@@ -643,7 +667,7 @@ to SEGMENTS relative to the doom user dir, if SEGMENTS is a symlink."
     (sexp-at-point)))
 
 
-;; BEGIN: agent-shell
+;;; BEGIN: agent-shell
 
 (require 'acp)
 (require 'agent-shell)
@@ -658,4 +682,36 @@ to SEGMENTS relative to the doom user dir, if SEGMENTS is a symlink."
               (when (string-match-p "\\*agent-shell-diff\\*" (buffer-name))
                 (evil-emacs-state)))))
 
-;; END: agent-shell
+;;; END: agent-shell
+
+(defun local/1password-auth-source-lookup (_backend _type host user _port)
+  "Construct the full entry-path for the 1password entry for HOST and USER.
+Usually starting with the `auth-source-1password-vault', followed
+by host and user."
+  (message "[local/1password-auth-source-lookup] host=\"%s\", user=\"%s\"" host user)
+  (cond ((and (string= host "api.github.com") (string= user "KenDJohnson^forge"))
+         "Employee/magit-forge-key/password")
+        ((and (string= host "api.github.com") (string= user "KenDJohnson^code-review"))
+         "Employee/magit-code-review/password")
+        (t (mapconcat #'identity (list auth-source-1password-vault host user) "/"))))
+
+(use-package! auth-source-1password
+  :config
+  (setq auth-source-1password-construct-secret-reference 'local/1password-auth-source-lookup)
+  (auth-source-1password-enable))
+
+
+;;; BEGIN: magit/forge/code-review
+
+(after! code-review
+  (add-hook 'code-review-mode-hook
+            (lambda ()
+              ;; include *Code-Review* buffer into current workspace
+              (persp-add-buffer (current-buffer)))))
+;;; END: magit/forge/code-review
+
+;;; BEGIN: format / apheleia
+(after! apheleia
+  (setf (alist-get 'taplo apheleia-formatters)
+        '("taplo" "format" "--colors" "never" "--stdin-filepath" filepath "-")))
+;;; END: format / apheleia

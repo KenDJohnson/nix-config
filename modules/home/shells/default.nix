@@ -28,6 +28,8 @@ in {
     ]
     ++ lib.optionals (pkgs.stdenv.isDarwin && machine.hasRole "desktop") [
       "/Applications/cmux.app/Contents/MacOS/"
+      "/Applications/Paseo.app/Contents/Resources/bin/"
+      "/Applications/Tailscale.app/Contents/MacOS/"
     ];
   home.sessionVariables =
     {
@@ -53,6 +55,7 @@ in {
       cat = "bat";
       pat = "bat --plain";
       bathelp = "bat --plain --language=help";
+      rgb = "rg --no-line-number --no-filename";
     }
     // lib.optionalAttrs config.programs.emacs.enable {
       ec = "${lib.getExe' config.programs.emacs.finalPackage "emacsclient"} --tty";

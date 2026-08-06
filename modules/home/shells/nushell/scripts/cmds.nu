@@ -169,29 +169,76 @@ def git-wt-detail [] {
     $wt | merge $branch_status
 }
 
-def git-wts [] {
-    ^git worktree list --porcelain
+def git-wts [
+    repo?: path
+] {
+    let worktrees = if ($repo | is-empty) {
+        ^git worktree list --porcelain
+    } else {
+        ^git -C $repo worktree list --porcelain
+    }
+    $worktrees
         | lines
-        | chunks 4
+        | chunk-by {|l| $l | is-not-empty }
+        | every 2
         | each { _parse-wt-group }
 }
 
 alias gwt = git-wts
 
-def "gwt detail" [] {
-    git-wts
+def "gwt detail" [
+    repo?: path
+] {
+    git-wts $repo
         | each {|wt| $wt | git-wt-detail }
 }
 
-def "gwt unpushed" [] {
-    gwt detail
+def "gwt unpushed" [
+    repo?: path
+] {
+    gwt detail $repo
         | where (($it.upstream.name | is-not-empty) and (not $it.upstream.exists))
 }
 
-def "gwt stale" [] {
-    gwt detail
+def "gwt stale" [
+    repo?: path
+] {
+    gwt detail $repo
         | where (($it.upstream.name | is-not-empty) and (not $it.upstream.exists))
 }
+
+def --env "gwt cd" [
+    branch: string
+    repo?: path
+] {
+    let wt = git-wts $repo | iter find {|wt| $wt.branch == $branch }
+    if ($wt | is-empty) {
+        error make {
+            msg: "worktree not found for branch",
+            labels: [{text: "branch", span: (metadata $branch).span}]
+        }
+    } else {
+        cd $wt.worktree
+    }
+}
+
+def without-env [variable, block: closure] {
+    match ($variable | describe) {
+      "string" => { hide-env $variable },
+      "list<string>" => { hide-env ...$variable },
+      _ => { error make { msg: "invalid type for variable", labels: [{text: "variable", span: (metadata $variable).span}], help: "must be `string` or `list<string>`"} },
+    }
+    do $block
+}
+
+# # change directory to the worktree for the provided
+# def "cdwt" [
+#     branch: string
+#     repo?: string
+# ] {
+#   if ($repo | is-not-empty)
+# }
+
 
 def multiline-run []: string -> any {
     let cmd = $in | lines | each { str replace '\' '' | str trim } | str join ' ' | split row ' '
