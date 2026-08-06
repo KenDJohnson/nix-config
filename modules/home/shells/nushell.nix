@@ -50,6 +50,8 @@
   nu_completion = name: (nu_scripts_file "custom-completions/${name}/${name}-completions.nu");
   mkCompletions = cmds: let stmts = map (c: "use ${nu_completion c} *") cmds; in lib.join "\n" stmts;
   nu_dir = path: "${config.programs.nushell.configDir}/${path}";
+  pluginRegistryPath = nu_dir "plugin.msgpackz";
+  nixPluginRegistry = config.home.file."${pluginRegistryPath}".source;
 in {
   programs.nushell = {
     enable = true;
@@ -134,9 +136,24 @@ in {
         # "zellij"
       ]);
   };
-  home.file.nuScripts = {
-    enable = true;
-    source = ./nushell/scripts;
-    target = nu_dir "scripts/";
+  # Keep Home Manager's generated registry as the declarative baseline, but
+  # install a writable copy so `plugin add` can update it at runtime.
+  home.file = {
+    nuScripts = {
+      enable = true;
+      source = ./nushell/scripts;
+      target = nu_dir "scripts/";
+    };
+    "${pluginRegistryPath}".enable = false;
   };
+  home.activation.mutableNushellPluginRegistry = lib.hm.dag.entryAfter ["linkGeneration"] ''
+    $DRY_RUN_CMD ${lib.getExe' pkgs.coreutils "install"} \
+      -Dm0644 \
+      ${lib.escapeShellArg nixPluginRegistry} \
+      ${lib.escapeShellArg "${pluginRegistryPath}.home-manager.tmp"}
+    $DRY_RUN_CMD ${lib.getExe' pkgs.coreutils "mv"} \
+      -f \
+      ${lib.escapeShellArg "${pluginRegistryPath}.home-manager.tmp"} \
+      ${lib.escapeShellArg pluginRegistryPath}
+  '';
 }
