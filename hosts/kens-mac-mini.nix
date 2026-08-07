@@ -20,6 +20,7 @@
     groups.nock = {
       gid = 499;
       description = "Nockchain service";
+      members = ["nock" "kjohnson"];
     };
 
     knownUsers = ["nock"];
