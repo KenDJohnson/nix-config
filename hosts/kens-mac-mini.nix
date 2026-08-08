@@ -15,30 +15,30 @@
   };
   networkingTools = true;
 
-  users = {
-    knownGroups = ["nock"];
-    groups.nock = {
-      gid = 499;
-      description = "Nockchain service";
-      members = ["nock" "kjohnson"];
-    };
+  # users = {
+  #   knownGroups = ["nock"];
+  #   groups.nock = {
+  #     gid = 499;
+  #     description = "Nockchain service";
+  #     members = ["nock" "kjohnson"];
+  #   };
 
-    knownUsers = ["nock"];
-    users.nock = {
-      uid = 499;
-      gid = 499;
-      description = "Nockchain service";
-      home = "/var/db/nockchain";
-      createHome = false;
-      isHidden = true;
+  #   knownUsers = ["nock"];
+  #   users.nock = {
+  #     uid = 499;
+  #     gid = 499;
+  #     description = "Nockchain service";
+  #     home = "/var/db/nockchain";
+  #     createHome = false;
+  #     isHidden = true;
 
-      # nix-darwin defaults new managed users to /usr/bin/false.
-      # No password or interactive login is configured.
-    };
-  };
+  #     # nix-darwin defaults new managed users to /usr/bin/false.
+  #     # No password or interactive login is configured.
+  #   };
+  # };
 
   services.nockchain-peer = {
-    enable = true;
+    enable = false;
 
     p2pPort = 30000;
 
@@ -74,7 +74,7 @@
     restartAfterPowerFailure = true;
     sleep = {
       computer = "never";
-      display = 15;
+      display = "never";
       harddisk = "never";
     };
   };

@@ -180,7 +180,7 @@ in {
         KeepAlive.SuccessfulExit = false;
         ThrottleInterval = 10;
         ExitTimeOut = 600;
-        Umask = 63;
+        Umask = 23; # umask 027 = rw-r-----
         SoftResourceLimits.NumberOfFiles = 65536;
         HardResourceLimits.NumberOfFiles = 65536;
         StandardOutPath = "${cfg.logDirectory}/nockchain.log";
