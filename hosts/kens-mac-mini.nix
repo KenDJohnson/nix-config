@@ -1,4 +1,8 @@
-{...}: {
+{
+  inputs,
+  pkgs,
+  ...
+}: {
   machine.profiles.personal = true;
   machine.roles.desktop = true;
   devTools = {
@@ -14,6 +18,10 @@
     latex = true;
   };
   networkingTools = true;
+
+  environment.systemPackages = [
+    inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default
+  ];
 
   # users = {
   #   knownGroups = ["nock"];
