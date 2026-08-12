@@ -703,6 +703,9 @@ by host and user."
 
 ;;; BEGIN: magit/forge/code-review
 
+(after! magit
+  (setq git-commit-style-convention-checks '(non-empty-second-line)))
+
 (after! code-review
   (add-hook 'code-review-mode-hook
             (lambda ()
