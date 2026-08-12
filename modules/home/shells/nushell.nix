@@ -100,7 +100,7 @@ in {
           ${lib.getLib pkgs.nu_scripts}/share/nu_scripts/modules/
           ${ghosttyIntegration.outPath}/nushell/vendor/autoload
         ];
-        source '${nu_scripts_file "sourced/typeof.nu"}'
+        # source '${nu_scripts_file "sourced/typeof.nu"}'
         use gitv2 gs
         use jc
 
