@@ -12,6 +12,6 @@ in {
       [imhex mermaid-cli]
       ++ lib.optionals (pkgs.stdenv.isDarwin) [raycast]
       ++ lib.optionals (pkgs.stdenv.isDarwin && machine.hasProfile "personal") [utm];
-    programs.obsidian.enable = lib.mkDefault true;
+    # programs.obsidian.enable = lib.mkDefault true;
   };
 }
