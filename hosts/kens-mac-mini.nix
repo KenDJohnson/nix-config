@@ -19,10 +19,6 @@
   };
   networkingTools = true;
 
-  environment.systemPackages = [
-    inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default
-  ];
-
   # users = {
   #   knownGroups = ["nock"];
   #   groups.nock = {

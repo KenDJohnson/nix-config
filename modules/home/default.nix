@@ -1,5 +1,6 @@
 {...}: {
   imports = [
+    ./agent.nix
     ./core.nix
     ./shells
     ./git.nix

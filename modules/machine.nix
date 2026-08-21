@@ -37,6 +37,7 @@ in {
     tmux.enable = mkEnableOption "tmux";
     zed.enable = mkEnableOption "Zed editor";
     sshPersonalHosts = mkEnableOption "Personal/homelab SSH hosts";
+    agentTools.enable = mkEnableOption "agent tools (e.g. herdr)" // {default = true;};
   };
 
   config.sshPersonalHosts = mkDefault (has config.machine.profiles "personal");

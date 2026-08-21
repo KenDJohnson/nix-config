@@ -38,8 +38,8 @@
 
     gws.url = "github:googleworkspace/cli";
     gws.inputs.nixpkgs.follows = "nixpkgs";
-    hermes-agent.url = "github:NousResearch/hermes-agent";
-    hermes-agent.inputs.nixpkgs.follows = "nixpkgs";
+
+    herdr.url = "github:herdrdev/herdr/v0.8.2";
   };
 
   outputs = inputs @ {
