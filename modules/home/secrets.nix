@@ -15,7 +15,7 @@ in {
     };
     ssh-hosts = {
       file = "${secretsDir}/ssh-hosts.age";
-      path = "${config.home.homeDirectory}/.local/share/agenix/ssh-hosts";
+      path = "${homeDir}/.ssh/config.d/secret-hosts";
     };
     mcp-tokens = {
       file = "${secretsDir}/mcp-tokens.age";
@@ -50,18 +50,6 @@ in {
       email = "$USER_EMAIL"
       EOF
               $DRY_RUN_CMD chmod 600 "${config.xdg.configHome}/jj/conf.d/secrets.toml"
-            fi
-    '';
-
-    # Generate SSH secret hosts config
-    generateSshSecretHosts = lib.hm.dag.entryAfter ["writeBoundary" "agenix"] ''
-            if [ -f "${config.age.secrets.ssh-hosts.path}" ]; then
-              mkdir -p "${homeDir}/.ssh/config.d"
-              source "${config.age.secrets.ssh-hosts.path}"
-              cat > "${homeDir}/.ssh/config.d/secret-hosts" <<EOF
-
-      EOF
-              $DRY_RUN_CMD chmod 600 "${homeDir}/.ssh/config.d/secret-hosts"
             fi
     '';
 
