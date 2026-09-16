@@ -14,6 +14,8 @@ in {
         BatteryShowPercentage = true;
       };
       dock = {
+        autohide = true;
+        autohide-delay = 0.5;
         tilesize = 24;
         mru-spaces = false;
         wvous-bl-corner = 1;
