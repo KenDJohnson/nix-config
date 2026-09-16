@@ -218,7 +218,7 @@ def --env "gwt cd" [
             labels: [{text: "branch", span: (metadata $branch).span}]
         }
     } else {
-        cd $wt.worktree
+        cd-direnv $wt.worktree
     }
 }
 

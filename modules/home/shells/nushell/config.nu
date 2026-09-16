@@ -529,3 +529,16 @@ def --wrapped codex-b [...rest] {
 # source cmds.nu
 
 # use completions-jj.nu *
+
+def find-direnv-hook []: nothing -> closure {
+    $env.config.hooks.pre_prompt | iter find {|c| view source $c | str contains "direnv export json"}
+}
+
+def --env load-direnv [] {
+    do (find-direnv-hook)
+}
+
+def --env cd-direnv [dir: path] {
+    cd $dir
+    load-direnv
+}
