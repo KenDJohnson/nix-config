@@ -6,16 +6,27 @@
   ...
 }: let
   machine = machineLib.forConfig config;
+  workSshFile = ./work-ssh.age;
+  hasWorkSsh = builtins.pathExists workSshFile;
 in {
   config = machine.applyWork {
-    age.secrets.work-identity = {
-      file = ./work-identity.age;
-      path = "${config.home.homeDirectory}/.local/share/agenix/work-identity";
-    };
-    age.secrets.work-nu = {
-      file = ./work.nu.age;
-      path = "${config.programs.nushell.configDir}/work.nu";
-    };
+    age.secrets =
+      {
+        work-identity = {
+          file = ./work-identity.age;
+          path = "${config.home.homeDirectory}/.local/share/agenix/work-identity";
+        };
+        work-nu = {
+          file = ./work.nu.age;
+          path = "${config.programs.nushell.configDir}/work.nu";
+        };
+      }
+      // lib.optionalAttrs hasWorkSsh {
+        work-ssh = {
+          file = workSshFile;
+          path = "${config.home.homeDirectory}/.ssh/config.d/work-hosts";
+        };
+      };
 
     home.packages = with pkgs; [
       cmake
@@ -61,5 +72,7 @@ in {
     programs.git.includes = lib.mkAfter [
       {path = "${config.xdg.configHome}/git/work-identity";}
     ];
+
+    programs.ssh.includes = lib.mkAfter (lib.optional hasWorkSsh "~/.ssh/config.d/work-hosts");
   };
 }
