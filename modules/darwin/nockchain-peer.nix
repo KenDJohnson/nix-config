@@ -85,6 +85,12 @@ in {
       description = "Existing macOS group that runs the peer.";
     };
 
+    workingDirectory = lib.mkOption {
+      type = lib.types.str;
+      default = "/var/db/nockchain";
+      description = "Working directory for the process.";
+    };
+
     stateDirectory = lib.mkOption {
       type = lib.types.str;
       default = "/var/db/nockchain";
@@ -129,7 +135,7 @@ in {
       };
     };
 
-    privageGrpc = {
+    privateGrpc = {
       listenAddress = lib.mkOption {
         type = lib.types.str;
         default = "127.0.0.1:5555";
@@ -164,7 +170,7 @@ in {
       cfg.package
       pkgs.grpcurl
     ];
-    system.activationScripts.users.text = lib.mkAfter ''
+    system.activationScripts.nockchain.text = ''
       ${pkgs.coreutils}/bin/install -d -m 0700 -o ${lib.escapeShellArg cfg.user} -g ${lib.escapeShellArg cfg.group} ${lib.escapeShellArg cfg.stateDirectory}
       ${pkgs.coreutils}/bin/install -d -m 0750 -o ${lib.escapeShellArg cfg.user} -g ${lib.escapeShellArg cfg.group} ${lib.escapeShellArg cfg.logDirectory}
     '';
@@ -197,7 +203,7 @@ in {
         ];
         UserName = cfg.user;
         GroupName = cfg.group;
-        WorkingDirectory = cfg.stateDirectory;
+        WorkingDirectory = cfg.workingDirectory;
         RunAtLoad = true;
         KeepAlive.SuccessfulExit = false;
         ThrottleInterval = 10;
