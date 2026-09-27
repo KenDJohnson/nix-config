@@ -48,9 +48,9 @@ in {
         udm = ssh-host {HostName = "unifi";};
         robit = ssh-host {HostName = "robit";};
         pve = ssh-host {HostName = "pve";};
-        homeassistant = ssh-host {HostName = "homeassistant.local";};
+        homeassistant = ssh-host {HostName = "ha";};
         ha-root = ssh-host {
-          HostName = "homeassistant.local";
+          HostName = "ha";
           Port = 22222;
         };
       };
