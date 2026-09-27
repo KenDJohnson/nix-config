@@ -113,6 +113,7 @@ def _parse-wt-group [] {
         | update branch? {|b| $b.branch | str replace -r '^refs/heads/' ''}
 }
 
+
 def git-status-parse1 [] {
     # 1 <XY> <sub> <mH> <mI> <mW> <hH> <hI> <path>
     # let xy = '(?<staged1>[\.MTADRCU?!])(?<staged2>[\.MTADRCU?!])'
@@ -124,7 +125,7 @@ def git-status-parse1 [] {
     # let hi = '(?<index_object>[0-9a-f]+)'
     # let path = '(?<path>.*)'
     let pattern = [
-        '1'
+        '^1'
         '(?<staged1>[\.MTADRCU?!])(?<staged2>[\.MTADRCU?!])'
         '(?<submodule>N\.\.\.|S[C\.][M\.][U\.])'
         '(?<head_mode>[0-7]{6})'
@@ -132,11 +133,34 @@ def git-status-parse1 [] {
         '(?<worktree_mode>[0-7]{6})'
         '(?<head_object>[0-9a-f]+)'
         '(?<index_object>[0-9a-f]+)'
-        '(?<path>.*)'
+        '(?<path>.*)$'
     ] | str join ' '
-    
 
-    $in | parse --regex $pattern
+    $in | parse --regex $pattern | first
+}
+
+def git-status-parse2 [] {
+    let pattern = [
+        '^2'
+        '(?<staged1>[\.MTADRCU?!])(?<staged2>[\.MTADRCU?!])'
+        '(?<submodule>N\.\.\.|S[C\.][M\.][U\.])'
+        '(?<head_mode>[0-7]{6})'
+        '(?<index_mode>[0-7]{6})'
+        '(?<worktree_mode>[0-7]{6})'
+        '(?<head_object>[0-9a-f]+)'
+        '(?<index_object>[0-9a-f]+)'
+        '(?<score>[RC][0-9]{1,3})'
+        '(?<path>.*)\t(?<orig_path>.*)$'
+    ] | str join ' '
+
+    $in | parse --regex $pattern | first
+}
+
+def git-tracked-status []: list<string> -> table {
+    let lines = $in
+    let first = $lines | where { str starts-with 1 } | each { git-status-parse1 }
+    let second = $lines | where { str starts-with 2 } | each { git-status-parse2 }
+    $first ++ $second
 }
 
 def git-wt-branch-status [wt: path] {
@@ -156,7 +180,20 @@ def git-wt-branch-status [wt: path] {
             exists: false
         }
     }
-    $branch | reject ab? | upsert upstream $upstream
+
+    let untracked = $wt_status | where { str starts-with '?' }
+    let conflicted = $wt_status | where { str starts-with 'u ' }
+    let file_status = $wt_status | git-tracked-status
+
+    let extra = {
+        upstream: $upstream,
+        untracked: $untracked,
+        conflicted: $conflicted,
+        files: $file_status,
+        dirty: (($untracked | is-not-empty) or ($conflicted | is-not-empty) or ($file_status | is-not-empty))
+    }
+
+    $branch | reject ab? | reject oid | merge $extra
 }
 
 def git-wt-remote [wt: path]: nothing -> string {
@@ -166,7 +203,8 @@ def git-wt-remote [wt: path]: nothing -> string {
 def git-wt-detail [] {
     let wt = $in
     let branch_status = git-wt-branch-status $wt.worktree
-    $wt | merge $branch_status
+    let size = { size: (du $wt.worktree | get 0.apparent) }
+    $wt | merge $branch_status | merge $size
 }
 
 def git-wts [
@@ -182,6 +220,27 @@ def git-wts [
         | chunk-by {|l| $l | is-not-empty }
         | every 2
         | each { _parse-wt-group }
+}
+
+def git-wt-main-wt [wt: path] {
+    git -C $wt rev-parse --path-format=absolute --git-common-dir | path dirname
+}
+
+def git-wt-remove [wt: path] {
+    let worktree = $wt | path expand
+    let main_wt = git-wt-main-wt $worktree
+    let paseo_ws = paseo workspace ls --json | from json | iter find {|ws| ($ws.cwd | path expand) == $worktree }
+    if ($paseo_ws | is-not-empty) {
+        paseo workspace archive $paseo_ws.workspaceId
+    }
+    if ($worktree | path exists) {
+        let remaining_ws = paseo workspace ls --json | from json | iter find {|ws| ($ws.cwd | path expand) == $worktree }
+        if ($remaining_ws | is-not-empty) {
+            error make { msg: "worktree is still in use by a Paseo workspace" }
+        }
+        git -C $worktree submodule deinit --all
+        git -C $main_wt worktree remove $worktree
+    }
 }
 
 alias gwt = git-wts
