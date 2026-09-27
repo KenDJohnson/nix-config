@@ -64,6 +64,7 @@ in {
         dix
         zellij
         gitleaks
+        python314
       ]);
     stateVersion = "25.11";
   };
