@@ -32,13 +32,16 @@ in {
     ];
     settings =
       {
-        github = ssh-host {
-          HostName = "github.com";
-          User = "git";
-          IdentityFile = in-home ".ssh/id_ed25519";
-          ServerAliveInterval = 45;
-          ServerAliveCountMax = 20;
-        };
+        github =
+          ssh-host {
+            HostName = "github.com";
+            User = "git";
+            IdentityFile = in-home ".ssh/id_ed25519";
+            IdentitiesOnly = "yes";
+            ServerAliveInterval = 45;
+            ServerAliveCountMax = 20;
+          }
+          // {header = "Host github github.com";};
         # // { UseKeychain = "yes"; };
       }
       // lib.optionalAttrs config.sshPersonalHosts {
