@@ -15,7 +15,7 @@ in {
       ++ lib.optionals config.devTools.languages.cpp [gnumake llvm clang libiconv]
       ++ lib.optionals config.devTools.languages.rust [capnproto capnproto-rust protobuf rust-script]
       ++ lib.optionals config.devTools.languages.zig [zig_0_15]
-      ++ lib.optionals config.devTools.languages.node [nodejs_24 pnpm]
+      ++ lib.optionals config.devTools.languages.node [nodejs_24 pnpm bun]
       ++ lib.optionals config.devTools.languages.python [uv python312Packages.grip]
       ++ lib.optionals config.devTools.latex [
         (texliveFull.withPackages (
