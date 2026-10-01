@@ -20,7 +20,7 @@ in {
     ];
   };
 
-  targets.darwin = lib.mkIf pkgs.stdenv.isDarwin {
+  targets.darwin = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     # Home Manager's copied app bundles can invalidate Ghostty's launch
     # constraints on macOS 26. Keep apps symlinked to their Nix store bundles.
     copyApps.enable = false;
@@ -28,7 +28,7 @@ in {
   };
 
   home = {
-    file = lib.mkIf pkgs.stdenv.isDarwin {
+    file = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
       "Applications/Home Manager Apps".force = true;
     };
     packages =
@@ -86,7 +86,7 @@ in {
       {
         enable = true;
       }
-      // lib.optionalAttrs pkgs.stdenv.isDarwin {
+      // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
         darwinFlake = "/etc/nix-darwin";
       };
     fzf = {

@@ -26,7 +26,7 @@ in {
       "${config.home.homeDirectory}/.local/bin"
       "${config.home.homeDirectory}/.opencode/bin"
     ]
-    ++ lib.optionals (pkgs.stdenv.isDarwin && machine.hasRole "desktop") [
+    ++ lib.optionals (pkgs.stdenv.hostPlatform.isDarwin && machine.hasRole "desktop") [
       "/Applications/cmux.app/Contents/MacOS/"
       "/Applications/Paseo.app/Contents/Resources/bin/"
       "/Applications/Tailscale.app/Contents/MacOS/"
@@ -39,7 +39,7 @@ in {
     // lib.optionalAttrs (machine.hasProfile "personal") {
       TASK_DIR = "${config.home.homeDirectory}/tasks/home";
     }
-    // lib.optionalAttrs (pkgs.stdenv.isDarwin) {
+    // lib.optionalAttrs (pkgs.stdenv.hostPlatform.isDarwin) {
       NIX_CONFIG_DIR = "/etc/nix-darwin";
     };
   home.sessionSearchVariables = {

@@ -20,6 +20,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Ragenix disables nixpkgs aliases, but its old overlay uses stdenv.isLinux.
+    # Manage the overlay here so --update refreshes it alongside nixpkgs.
+    rust-overlay.url = "github:oxalica/rust-overlay";
+    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
+
     nockchain-src = {
       url = "github:zorp-corp/nockchain/86a4a5bbd9b7dd27fecd1fa1c9c94b85277d6123";
       flake = false;
@@ -30,11 +35,10 @@
 
     agenix.url = "github:ryantm/agenix";
     agenix.inputs.nixpkgs.follows = "nixpkgs";
-    agenix.inputs.darwin.follows = "nix-darwin";
-    agenix.inputs.home-manager.follows = "home-manager";
 
     ragenix.url = "github:yaxitech/ragenix";
     ragenix.inputs.nixpkgs.follows = "nixpkgs";
+    ragenix.inputs.rust-overlay.follows = "rust-overlay";
 
     gws.url = "github:googleworkspace/cli";
     gws.inputs.nixpkgs.follows = "nixpkgs";
