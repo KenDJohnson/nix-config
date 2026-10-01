@@ -386,7 +386,10 @@ do --env {
 
             # NIX SHELL
             if ($env.IN_NIX_SHELL? | is-not-empty) {
-            $suffix ++= [ $"(ansi light_blue_bold)nix" ]
+                $suffix ++= [ $"(ansi light_blue_bold)nix" ]
+            }
+            if ($env.SHLVL > 1) {
+                $suffix ++= [ $"(ansi light_green_dimmed)(char -u f105)($env.SHLVL)" ]
             }
 
             $suffix | each { $'(ansi light_yellow_bold)•(ansi reset) ($in)(ansi reset)' } | str join " "
