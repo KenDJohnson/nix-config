@@ -107,6 +107,7 @@ in {
             codex = config.codex;
             tmux = config.tmux;
             zed = config.zed;
+            agents = config.agents;
             sshPersonalHosts = config.sshPersonalHosts;
             # Identity
             home.username = hostConfig.username;

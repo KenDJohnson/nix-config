@@ -38,6 +38,10 @@ in {
     zed.enable = mkEnableOption "Zed editor";
     sshPersonalHosts = mkEnableOption "Personal/homelab SSH hosts";
     agentTools.enable = mkEnableOption "agent tools (e.g. herdr)" // {default = true;};
+    agents = {
+      enable = mkEnableOption "agents and harnesses" // {default = true;};
+      omp.enable = mkEnableOption "OMP agent harness" // {default = false;};
+    };
   };
 
   config.sshPersonalHosts = mkDefault (has config.machine.profiles "personal");

@@ -43,6 +43,10 @@
     gws.url = "github:googleworkspace/cli";
     gws.inputs.nixpkgs.follows = "nixpkgs";
 
+    omp.url = "github:can1357/oh-my-pi/main";
+    omp.inputs.nixpkgs.follows = "nixpkgs";
+    omp.inputs.rust-overlay.follows = "rust-overlay";
+
     herdr.url = "github:herdrdev/herdr/v0.8.2";
   };
 
