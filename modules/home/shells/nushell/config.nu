@@ -38,6 +38,8 @@ $env.ENV_CONVERSIONS = $env.ENV_CONVERSIONS | merge {
 $env.config.show_banner = false
 $env.config.buffer_editor = ["emacsclient", "--tty"]
 
+$env.config.max_last_result_size = 10mb
+
 $env.EDITOR = $env.config.buffer_editor | str join " "
 
 $env.config.history.file_format = "sqlite"
@@ -113,8 +115,6 @@ $env.config.hooks.env_change = {}
 
 $env.config.hooks.display_output = {||
   tee { table --expand | print }
-  # SQLiteDatabase doesn't support equality comparisions
-  | try { if $in != null { $env.last = $in } }
 }
 
 $env.config.hooks.command_not_found = []
@@ -180,7 +180,7 @@ $env.config.color_config.header = "light_yellow_bold"
 
 # Retrieve the output of the last command.
 def _ []: nothing -> any {
-  $env.last?
+  $ans.last
 }
 
 # Create a directory and cd into it.
