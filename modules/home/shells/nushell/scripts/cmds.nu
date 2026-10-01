@@ -226,20 +226,53 @@ def git-wt-main-wt [wt: path] {
     git -C $wt rev-parse --path-format=absolute --git-common-dir | path dirname
 }
 
-def git-wt-remove [wt: path] {
+def git-wt-remove [
+    wt: path
+    --force
+] {
     let worktree = $wt | path expand
     let main_wt = git-wt-main-wt $worktree
-    let paseo_ws = paseo workspace ls --json | from json | iter find {|ws| ($ws.cwd | path expand) == $worktree }
-    if ($paseo_ws | is-not-empty) {
+    let paseo_ws = paseo workspace ls | iter find {|ws| ($ws.cwd | path expand) == $worktree }
+    let paseo_result = if ($paseo_ws | is-not-empty) {
         paseo workspace archive $paseo_ws.workspaceId
+    } else {
+        {}
     }
     if ($worktree | path exists) {
-        let remaining_ws = paseo workspace ls --json | from json | iter find {|ws| ($ws.cwd | path expand) == $worktree }
+        let size = du -a $worktree | get 0.physical
+        let remaining_ws = paseo workspace ls | iter find {|ws| ($ws.cwd | path expand) == $worktree }
         if ($remaining_ws | is-not-empty) {
             error make { msg: "worktree is still in use by a Paseo workspace" }
         }
-        git -C $worktree submodule deinit --all
-        git -C $main_wt worktree remove $worktree
+        git -C $worktree submodule --quiet deinit --all
+        let wt_result = if $force {
+            git -C $main_wt worktree remove --force $worktree | complete
+        } else {
+            git -C $main_wt worktree remove $worktree | complete
+        }
+        let result = { worktree: $worktree, size: $size, paseo: $paseo_result }
+        if $wt_result.exit_code == 0 {
+            $result | merge { state: "removed" }
+        } else if $force {
+            $result | merge { state: "failed", result: $wt_result }
+        } else {
+            let wt_result2 = if is-terminal {
+                print "git worktree remove failed, retry with force? (Y/n)"
+                let answer = input listen --types [key] --timeout 10sec
+                if $answer.code =~ "[Yy]|enter" {
+                    git -C $main_wt worktree remove --force $worktree | complete
+                }
+            }
+            if ($wt_result2 | is-not-empty) and $wt_result.exit_code == 0 {
+                $result | merge { state: "removed", result: $wt_result2 }
+            } else if ($wt_result2 | is-not-empty) {
+                $result | merge { state: "failed", result: $wt_result, retry_result: $wt_result2 }
+            } else {
+                $result | merge { state: "failed", result: $wt_result }
+            }
+        }
+    } else {
+        { worktree: $worktree, state: "missing", paseo: $paseo_result }
     }
 }
 
@@ -303,4 +336,15 @@ def multiline-run []: string -> any {
     let cmd = $in | lines | each { str replace '\' '' | str trim } | str join ' ' | split row ' '
     print -e $"($cmd | str join ' ')"
     ^$cmd
+}
+
+
+def --wrapped paseo [...rest] {
+    if ($rest | any {|p| $p == "-h" or $p == "--help" }) {
+       ^paseo ...$rest
+    } else if ($rest | any {|p| $p == "--json"}) {
+        ^paseo ...$rest
+    } else {
+        ^paseo --json ...$rest | from json
+    }
 }
