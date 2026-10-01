@@ -348,3 +348,7 @@ def --wrapped paseo [...rest] {
         ^paseo --json ...$rest | from json
     }
 }
+
+def nix-fetch-hash [url: string] {
+    nix-prefetch-url --type sha256 $url | xargs nix hash convert --hash-algo sha256 --to sri
+}
