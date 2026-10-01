@@ -50,6 +50,7 @@
   nu_dir = path: "${config.programs.nushell.configDir}/${path}";
   pluginRegistryPath = nu_dir "plugin.msgpackz";
   nixPluginRegistry = config.home.file."${pluginRegistryPath}".source;
+  # nuModules = lib.filesystem.readDir ./nushell/modules |> lib.filterAttrs (p: t: t == "regular") |> builtins.attrNames |> lib.filter (lib.strings.hasSuffix ".nu");
 in {
   programs.nushell = {
     enable = true;
@@ -100,6 +101,9 @@ in {
           ${lib.getLib pkgs.nu_scripts}/share/nu_scripts/modules/
           ${ghosttyIntegration.outPath}/nushell/vendor/autoload
         ];
+
+        use core.nu
+
         # source '${nu_scripts_file "sourced/typeof.nu"}'
         use gitv2 gs
         use jc
@@ -122,6 +126,11 @@ in {
       enable = true;
       source = ./nushell/scripts;
       target = nu_dir "scripts/";
+    };
+    nuModules = {
+      enable = true;
+      source = ./nushell/modules;
+      target = nu_dir "modules/";
     };
     "${pluginRegistryPath}".enable = false;
   };

@@ -65,6 +65,7 @@ in {
         zellij
         gitleaks
         python314
+        qrrs
       ]);
     stateVersion = "25.11";
   };
