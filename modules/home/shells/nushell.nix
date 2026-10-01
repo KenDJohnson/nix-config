@@ -114,9 +114,11 @@ in {
       ''
       + lib.optionalString (machine.hasProfile "work") ''
         const work_nu = "${nu_dir "work.nu"}"
-        source (if ($work_nu | path exists) { $work_nu } else { null })
+        source $work_nu
+        # source (if ($work_nu | path exists) { $work_nu } else { null })
         const work_staging_nu = "${nu_dir "work-staging.nu"}"
-        source (if ($work_staging_nu | path exists) { $work_staging_nu } else { null })
+        source $work_staging_nu
+        # source (if ($work_staging_nu | path exists) { $work_staging_nu } else { null })
       '';
   };
   # Keep Home Manager's generated registry as the declarative baseline, but
