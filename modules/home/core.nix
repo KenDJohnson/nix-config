@@ -77,6 +77,14 @@ in {
         theme = "OneHalfDark";
         pager = "less -FR";
       };
+      syntaxes = {
+        nu = {
+          src = pkgs.fetchurl {
+            url = "https://gist.githubusercontent.com/melMass/294c21a113d0bd329ae935a79879fe04/raw/93ed98bf1a02c4c0016eb49148cf111572235e41/nushell.sublime-syntax";
+            hash = "sha256-QSjnGrv3o9qZ74b6Hk6pXJ6fx2Dq8U0cu9fyd51zokw=";
+          };
+        };
+      };
     };
     man = {
       enable = true;
