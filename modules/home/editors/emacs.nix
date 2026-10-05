@@ -106,6 +106,8 @@ in {
           pkgs.emacsclient-commands
           pkgs.terraform-ls
           pkgs.typescript-language-server
+          pkgs.cmark-gfm
+          pkgs.mermaid-cli
           emacs-regular
           emacs-regular-daemon
           emacsclient-regular
@@ -116,6 +118,20 @@ in {
             recursive = true;
             source = ../doom.d;
             target = doom-dir;
+          };
+          gh-preview = {
+            enable = true;
+            source = config.lib.file.mkOutOfStoreSymlink "${homeDir}/git/emacs-gh-preview";
+            target = "${doom-dir}lisp/gh-preview";
+          };
+          gh-preview-runtime = {
+            enable = true;
+            source = pkgs.writeText "gh-preview-runtime.el" ''
+              ;;; gh-preview-runtime.el --- Native renderers -*- lexical-binding: t; -*-
+              (setq gh-preview-cmark-command "${pkgs.cmark-gfm}/bin/cmark-gfm"
+                    gh-preview-mermaid-command "${pkgs.mermaid-cli}/bin/mmdc")
+            '';
+            target = "${doom-dir}lisp/gh-preview-runtime.el";
           };
           doom-treesit-typescript-dylib = {
             enable = true;

@@ -382,6 +382,14 @@
   :mode (("\\.mmd\\'" . mermaid-mode)
          ("\\.mermaid\\'" . mermaid-mode)))
 
+(add-to-list 'load-path
+             (expand-file-name "lisp/gh-preview" regular-emacs/doom-dir))
+(load (expand-file-name "lisp/gh-preview-runtime.el" regular-emacs/doom-dir) t t)
+(use-package gh-preview
+  :commands (gh-preview-toggle gh-preview-mode)
+  :bind (:map markdown-mode-map
+              ("C-c C-p" . gh-preview-toggle)))
+
 (use-package nushell-mode
   :mode ("\\.nu\\'" . nushell-mode))
 

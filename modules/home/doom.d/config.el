@@ -488,6 +488,22 @@ in any order. BODY... can contain single or multiple expressions."
           (lambda ()
             (set-fill-column 110)))
 
+;; Native Markdown text and inline Mermaid images; no webview or GitHub API.
+(add-to-list 'load-path (expand-file-name "lisp/gh-preview" doom-user-dir))
+(load! "lisp/gh-preview-runtime" doom-user-dir t)
+(autoload 'gh-preview-toggle "gh-preview" nil t)
+(after! markdown-mode
+  (map! :map markdown-mode-map
+        "C-c C-p" #'gh-preview-toggle
+        :localleader
+        :desc "Toggle local preview" "P" #'gh-preview-toggle))
+(after! gh-preview
+  (when (fboundp 'evil-set-initial-state)
+    (evil-set-initial-state 'gh-preview-view-mode 'emacs))
+  (map! :map gh-preview-view-mode-map
+        :localleader
+        :desc "Toggle local preview" "P" #'gh-preview-toggle))
+
 (after! grip-mode
   (setq grip-theme 'dark))
 
