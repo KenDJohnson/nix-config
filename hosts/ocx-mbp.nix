@@ -15,6 +15,13 @@
   };
   codex.enable = true;
   zed.enable = true;
+  # Provider/model are declarative; Codex OAuth credentials remain runtime-only.
+  # Codex OAuth login: CODEX_HOME="$HOME/.local/share/hindsight/codex" codex login
+  services.hindsight = {
+    enable = true;
+    llmProvider = "openai-codex";
+    llmModel = "gpt-5.4-mini";
+  };
   networkingTools = false;
   tmux.enable = true;
 }

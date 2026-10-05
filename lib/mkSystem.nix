@@ -3,6 +3,9 @@
   machineLib = import ./machineLib.nix {lib = nixpkgs.lib;};
   overlays = [
     (final: prev: {
+      hindsight = final.callPackage ../pkgs/hindsight {inherit inputs;};
+      hindsight-control-plane = final.callPackage ../pkgs/hindsight-control-plane.nix {};
+
       nockchain = let
         rustToolchain =
           (inputs.fenix.packages.${final.stdenv.hostPlatform.system}.toolchainOf {
