@@ -256,7 +256,7 @@ def git-wt-remove [
         } else if $force {
             $result | merge { state: "failed", result: $wt_result }
         } else {
-            let wt_result2 = if is-terminal {
+            let wt_result2 = if (is-terminal) {
                 print "git worktree remove failed, retry with force? (Y/n)"
                 let answer = input listen --types [key] --timeout 10sec
                 if $answer.code =~ "[Yy]|enter" {
