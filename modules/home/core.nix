@@ -40,6 +40,7 @@ in {
         curl
         fd
         jq
+        jaq
         less
         ripgrep
         tree-sitter
@@ -66,6 +67,7 @@ in {
         gitleaks
         python314
         qrrs
+        devenv
       ]);
     stateVersion = "25.11";
   };
