@@ -113,10 +113,6 @@ $env.config.hooks.pre_execution = [
 
 $env.config.hooks.env_change = {}
 
-$env.config.hooks.display_output = {||
-  tee { table --expand | print }
-}
-
 $env.config.hooks.command_not_found = []
 
 # `nu-highlight` with default colors
