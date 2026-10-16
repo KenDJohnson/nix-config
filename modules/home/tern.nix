@@ -36,16 +36,15 @@
       --config ${lib.escapeShellArg "${nu.configDir}/config.nu"} \
       "$@"
   '';
-  paneShell =
-    pkgs.writeShellScript "tern-nu-pane" # bash
-    
-    ''
-      exec ${nuExe} \
-        --login \
-        --env-config ${lib.escapeShellArg "${nu.configDir}/env.nu"} \
-        --config ${nuPaneConfig} \
-        "$@"
-    '';
+  # paneShell =
+  #   pkgs.writeShellScript "tern-nu-pane" # bash
+  #   ''
+  #     exec ${nuExe} \
+  #       --login \
+  #       --env-config ${lib.escapeShellArg "${nu.configDir}/env.nu"} \
+  #       --config ${nuPaneConfig} \
+  #       "$@"
+  #   '';
 in {
   config =
     lib.mkIf (pkgs.stdenv.hostPlatform.isDarwin && machine.hasRole "desktop")
