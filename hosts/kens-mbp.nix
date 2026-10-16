@@ -1,6 +1,6 @@
 {...}: {
   machine.profiles.personal = true;
-  machine.profiles.work = true;
+  machine.profiles.work = false;
   machine.roles.desktop = true;
   determinateNix.determinateNixd.builder.memoryBytes = 17179869184;
   devTools = {
