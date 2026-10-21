@@ -7,6 +7,10 @@
 }: let
   machine = machineLib.forConfig config;
   nu = config.programs.nushell;
+  tern_omp =
+    if pkgs.stdenv.hostPlatform.isDarwin
+    then "${config.home.homeDirectory}/Library/Application Support/Tern/omp/bin"
+    else "";
   nuExe = lib.getExe nu.package;
   nuPaneConfig =
     pkgs.writers.writeText "tern-nu-pane.nu"
@@ -28,8 +32,8 @@
       )
     '';
   paneShell = pkgs.writeShellScriptBin "tern-nu-pane" ''
-    # export XDG_CONFIG_HOME=${lib.escapeShellArg config.xdg.configHome}
-    # export XDG_DATA_HOME=${lib.escapeShellArg config.xdg.dataHome}
+    export XDG_CONFIG_HOME=${lib.escapeShellArg config.xdg.configHome}
+    export XDG_DATA_HOME=${lib.escapeShellArg config.xdg.dataHome}
     exec ${nuExe} \
       --login \
       --env-config ${lib.escapeShellArg "${nu.configDir}/env.nu"} \

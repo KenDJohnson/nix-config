@@ -80,6 +80,10 @@ in {
 
         ${sessionSearchEnv}
 
+        if ($env.TERM_PROGRAM? == "tern" and ($env.TERN_PATH_PREPEND? | is-not-empty)) {
+            $env.PATH = ($env.TERN_PATH_PREPEND | split row ":" | path expand --no-symlink) ++ $env.PATH
+        }
+
         const codex_mcp_tokens_env = "${config.xdg.configHome}/nushell/mcp-tokens.nu"
         source-env (if ($codex_mcp_tokens_env | path exists) { $codex_mcp_tokens_env } else { null })
       ''

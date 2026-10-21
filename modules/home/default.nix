@@ -15,5 +15,6 @@
     ./work.nix
     ./networking.nix
     ./llm.nix
+    ./tern.nix
   ];
 }
