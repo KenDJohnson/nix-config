@@ -93,6 +93,17 @@
     meta.mainProgram = "hindsight-api";
   };
 
+  # launchd loads these jobs before Determinate mounts /nix. Use the same
+  # native-shell boot guard as nix-darwin's activate-system daemon.
+  waitForNixStore = arguments:
+    [
+      "/bin/sh"
+      "-c"
+      ''/bin/wait4path /nix/store && exec "$@"''
+      "hindsight"
+    ]
+    ++ arguments;
+
   serviceConfig = {
     UserName = cfg.user;
     GroupName = "staff";
@@ -228,6 +239,10 @@ in {
         The installed hindsight-api and hindsight-control-plane commands can
         also run manually; stop the daemons first to avoid port conflicts.
 
+        At boot, each daemon starts through macOS /bin/sh and waits for
+        /nix/store, avoiding a race with the Nix volume mount. The native
+        launcher remains runnable before Nix is mounted.
+
         PostgreSQL data persists in services.hindsight.databaseDirectory; local
         models download from Hugging Face on first use. The pg0 database bundled
         upstream is not used: its Darwin binaries depend on Homebrew libraries.
@@ -256,7 +271,7 @@ in {
       serviceConfig
       // {
         EnvironmentVariables = {HOME = homeDirectory;};
-        ProgramArguments = [(lib.getExe postgresqlStart) cfg.databaseDirectory];
+        ProgramArguments = waitForNixStore [(lib.getExe postgresqlStart) cfg.databaseDirectory];
         StandardOutPath = "${cfg.logDirectory}/postgresql.log";
         StandardErrorPath = "${cfg.logDirectory}/postgresql.error.log";
       };
@@ -264,7 +279,7 @@ in {
     launchd.daemons.hindsight-api.serviceConfig =
       serviceConfig
       // {
-        ProgramArguments = [
+        ProgramArguments = waitForNixStore [
           "${package}/bin/hindsight-api"
           "--host"
           "127.0.0.1"
@@ -278,7 +293,7 @@ in {
     launchd.daemons.hindsight-control-plane.serviceConfig =
       serviceConfig
       // {
-        ProgramArguments = [
+        ProgramArguments = waitForNixStore [
           "${package}/bin/hindsight-control-plane"
           "--port"
           (toString cfg.controlPlanePort)
