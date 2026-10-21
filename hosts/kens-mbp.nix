@@ -17,6 +17,12 @@
   };
   networkingTools = true;
 
+  services.hindsight = {
+    enable = true;
+    llmProvider = "openai-codex";
+    llmModel = "gpt-6-luna";
+  };
+
   services.nockchain-peer = {
     enable = true;
 
