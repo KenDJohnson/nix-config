@@ -6,6 +6,17 @@
       hindsight = final.callPackage ../pkgs/hindsight {inherit inputs;};
       hindsight-control-plane = final.callPackage ../pkgs/hindsight-control-plane.nix {};
 
+      # nix-direnv 3.2.0 refreshes watched cache files as well as GC roots,
+      # causing terminal panes to invalidate each other's cached shells.
+      # Preserve GC-root aging without changing cache mtimes. Remove once the
+      # packaged nix-direnv stops refreshing regular cache files.
+      nix-direnv = prev.nix-direnv.overrideAttrs (old: {
+        # Resholve installs this source directly, bypassing its unpacked tree.
+        src = old.src.overrideAttrs (unresholved: {
+          patches = (unresholved.patches or []) ++ [../pkgs/nix-direnv-refresh-gcroots.patch];
+        });
+      });
+
       nockchain = let
         rustToolchain =
           (inputs.fenix.packages.${final.stdenv.hostPlatform.system}.toolchainOf {

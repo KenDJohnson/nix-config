@@ -1,0 +1,21 @@
+--- a/direnvrc
++++ b/direnvrc
+@@ -213,10 +213,14 @@
+ _nix_refresh_gcroots() {
+   # Use touch to update all symlinks' timestamps to prevent nh
+   # from garbage collecting the frequently used direnv environment.
+-  local layout_dir
++  local layout_dir gcroot
+   layout_dir=$(direnv_layout_dir)
+ 
+-  if ! touch -h "${layout_dir}"/flake-profile-* "${layout_dir}"/flake-inputs/* "${layout_dir}"/nix-profile-* 2>/dev/null; then
+-    _nix_direnv_warning "could not refresh gcroots; layout directory may be read-only"
+-  fi
++  # The profile globs also match watched .rc caches. Touching those makes
++  # other shells reload at their next prompt even when inputs are unchanged.
++  for gcroot in "${layout_dir}"/flake-profile-* "${layout_dir}"/flake-inputs/* "${layout_dir}"/nix-profile-*; do
++    if [[ -L $gcroot ]] && ! touch -h "$gcroot" 2>/dev/null; then
++      _nix_direnv_warning "could not refresh gcroots; layout directory may be read-only"
++    fi
++  done
+ }
