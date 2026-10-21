@@ -7,52 +7,78 @@
 }: let
   machine = machineLib.forConfig config;
   nu = config.programs.nushell;
-  tern_omp =
-    if pkgs.stdenv.hostPlatform.isDarwin
-    then "${config.home.homeDirectory}/Library/Application Support/Tern/omp/bin"
-    else "";
   nuExe = lib.getExe nu.package;
-  nuPaneConfig =
-    pkgs.writers.writeText "tern-nu-pane.nu"
-    ''
-      source ($nu.default-config-dir | path join "config.nu")
-      $env.config.hooks.pre_execution = (
-        $env.config.hooks.pre_execution? | default [] | append [
-          {||
-            try {
-              let line = commandline
-              let sq = "\u{27}"
-              let escape = $sq + "\u{5c}" + $sq + $sq
-              let quoted = $sq + ($line | str replace --all $sq $escape) + $sq
-              print --no-newline $"\u{1b}]133;C;cmdline=($quoted)\u{7}"
-
-            } catch { }
-          }
-        ]
-      )
-    '';
-  paneShell = pkgs.writeShellScriptBin "tern-nu-pane" ''
+  nuArgs = lib.escapeShellArgs [
+    "--env-config"
+    "${nu.configDir}/env.nu"
+    "--config"
+    "${nu.configDir}/config.nu"
+  ];
+  xdgEnv = ''
     export XDG_CONFIG_HOME=${lib.escapeShellArg config.xdg.configHome}
     export XDG_DATA_HOME=${lib.escapeShellArg config.xdg.dataHome}
-    exec ${nuExe} \
-      --login \
-      --env-config ${lib.escapeShellArg "${nu.configDir}/env.nu"} \
-      --config ${lib.escapeShellArg "${nu.configDir}/config.nu"} \
-      "$@"
   '';
-  # paneShell =
-  #   pkgs.writeShellScript "tern-nu-pane" # bash
-  #   ''
-  #     exec ${nuExe} \
-  #       --login \
-  #       --env-config ${lib.escapeShellArg "${nu.configDir}/env.nu"} \
-  #       --config ${nuPaneConfig} \
-  #       "$@"
-  #   '';
+
+  # Probe protocol adapted from:
+  # https://github.com/plumj-am/nixos/blob/master/packages/tern/tern.nix
+  # Tern probes $SHELL with POSIX syntax, independently of settings.json's shell.
+  loginProbe = pkgs.writeShellScript "tern-login-shell-probe" ''
+    ${xdgEnv}
+    case " $* " in
+      *__stencil_login_env__*|*__tern_login_env__*|*__tern_login_path__*)
+        exec ${lib.getExe pkgs.bashInteractive} "$@"
+        ;;
+    esac
+    # login(1)'s leading '-' in argv[0] is lost when the shell is a script.
+    # Its argument-free invocation should still start a Nu login shell.
+    if [ "$#" -eq 0 ]; then
+      set -- --login
+    fi
+    exec ${nuExe} ${nuArgs} "$@"
+  '';
+  # Keep the basename "nu" for Tern's shell detection, but do not put this on
+  # PATH: it would collide with the real Nushell package's bin/nu.
+  loginShell = pkgs.runCommand "tern-login-shell" {} ''
+    install -Dm755 ${loginProbe} "$out/bin/nu"
+  '';
+  paneShell = pkgs.writeShellScriptBin "tern-nu-pane" ''
+    ${xdgEnv}
+    export SHELL=${loginShell}/bin/nu
+    exec ${nuExe} --login ${nuArgs} "$@"
+  '';
 in {
-  config =
-    lib.mkIf (pkgs.stdenv.hostPlatform.isDarwin && machine.hasRole "desktop")
-    {
-      home.packages = [paneShell];
-    };
+  config = lib.mkIf (pkgs.stdenv.hostPlatform.isDarwin && machine.hasRole "desktop" && nu.enable) {
+    home.packages = [paneShell];
+    home.sessionVariables.SHELL = "${loginShell}/bin/nu";
+
+    # Use the normal Home Manager config so plain `nu` panes, including restored
+    # panes, get the payload too. Append after the existing title/config hooks.
+    programs.nushell.extraConfig = lib.mkAfter ''
+      if $env.TERM_PROGRAM? == "tern" {
+        $env.config.hooks.pre_execution = (
+          $env.config.hooks.pre_execution? | default [] | append [
+            {||
+              try {
+                let line = (commandline)
+                if not ($line | is-empty) {
+                  # Quote each payload field as one POSIX word, including
+                  # embedded apostrophes, for Tern's command-line decoder.
+                  let sq = "\u{27}"
+                  let esc = ($sq + "\u{5c}" + $sq + $sq)
+                  let trimmed = ($line | str trim --left)
+                  let head = ($trimmed | split row --regex '\s+' | first)
+                  let hit = (scope aliases | where name == $head | get expansion)
+                  let rest = ($trimmed | str replace --regex '^\S+' "")
+                  let full = (if ($hit | is-empty) { $line } else { ($hit | first) + $rest })
+                  let typed = ($sq + ($line | str replace --all -- $sq $esc) + $sq)
+                  let expanded = ($sq + ($full | str replace --all -- $sq $esc) + $sq)
+                  print -n $"\u{1b}]133;C;cmdline=($typed);cmdline_expanded=($expanded)\u{7}"
+                }
+              } catch { }
+            }
+          ]
+        )
+      }
+    '';
+  };
 }

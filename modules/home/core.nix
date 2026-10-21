@@ -101,7 +101,7 @@ in {
         darwinFlake = "/etc/nix-darwin";
       };
     fzf = {
-      enable = true;
+      enable = false;
       enableZshIntegration = true;
     };
     direnv = {

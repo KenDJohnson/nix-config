@@ -11,7 +11,8 @@
   toNu = lib.hm.nushell.toNushell {};
 
   baseNushellEnv = {
-    SHELL = lib.getExe pkgs.nushell;
+    # Preserve a configured shell shim (e.g. Tern's POSIX login probe) in Nu.
+    SHELL = config.home.sessionVariables.SHELL or (lib.getExe config.programs.nushell.package);
   };
   variableValues =
     config.home.sessionVariables
