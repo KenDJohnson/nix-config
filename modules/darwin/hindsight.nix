@@ -139,11 +139,14 @@ in {
     llmModel = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
       default = null;
-      example = "gpt-5.4-mini";
+      example = "gpt-5.6-luna";
       description = ''
         Non-secret LLM model name. When set, this Nix value takes precedence
         over the runtime environment file and inherited environment variables.
         Null leaves the upstream/runtime model selection unchanged.
+
+        For openai-codex, select a model available with ChatGPT authentication;
+        OpenAI Platform API model availability is a separate catalog.
       '';
     };
 

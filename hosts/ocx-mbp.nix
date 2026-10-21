@@ -20,7 +20,7 @@
   services.hindsight = {
     enable = true;
     llmProvider = "openai-codex";
-    llmModel = "gpt-5.4-mini";
+    llmModel = "gpt-6-luna";
   };
   networkingTools = false;
   tmux.enable = true;
