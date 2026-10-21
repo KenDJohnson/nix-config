@@ -36,7 +36,14 @@ $env.ENV_CONVERSIONS = $env.ENV_CONVERSIONS | merge {
 }
 
 $env.config.show_banner = false
-$env.config.buffer_editor = ["emacsclient", "--tty"]
+
+# workaround for tern using xterm-kitty TERM setting causing failure in emacsclient --tty
+
+if $env.TERM_PROGRAM? == "tern" {
+    $env.config.buffer_editor = ["emacsclient", "--create-frame"]
+} else {
+    $env.config.buffer_editor = ["emacsclient", "--tty"]
+}
 
 $env.config.max_last_result_size = 10mb
 
