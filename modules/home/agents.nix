@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   inputs,
   ...
 }: let
@@ -29,6 +30,9 @@
       summaryInjectionTokenLimit = 5000;
     };
   };
+  cfg = config.programs.omp;
+  yaml = pkgs.formats.yaml {};
+  configFile = yaml.generate "omp-config.yml" cfg.settings;
 in {
   imports = [inputs.omp.homeManagerModules.default];
 
@@ -57,7 +61,7 @@ in {
         };
         checkpoint.enabled = true;
         collab = {
-          autoStart = "control";
+          autoStart = "off";
         };
         composer.shape = "box";
         contextPromotion.enabled = false;
@@ -77,15 +81,37 @@ in {
         interruptMode = "immediate";
         # setupVersion = 2;
         live.voice = "sol"; # arbor|breeze|cove|ember|juniper|maple|sol|spruce|vale
+        memory.backend = "hindsight";
+        hindsight = {
+          apiUrl = "http://localhost:8888";
+          bankId = "omp";
+
+          scoping = "global"; # global|per-project|per-project-tagged
+          autoRecall = true;
+          autoRetain = true;
+          retainMode = "full-session"; #full-session|last-turn
+          retainEveryNTurns = 3;
+          retainOverlapTurns = 2;
+          retainContext = "omp";
+        };
         modelRoles = {
           default = mkModel {model = default-model;};
-          slow = mkModel {model = "gpt-6-astra";};
-          designer = mkModel {model = "gpt-6-astra";};
+          slow = mkModel {
+            model = "claude-opus-5-5";
+            provider = "anthropic";
+          };
+          designer = mkModel {
+            model = "claude-opus-5-5";
+            provider = "anthropic";
+          };
           smol = mkModel {
             model = "gpt-6-luna";
             effort = "xhigh";
           };
-          plan = mkModel {model = "gpt-6-astra";};
+          plan = mkModel {
+            model = "claude-opus-5-5";
+            provider = "anthropic";
+          };
         };
         power.sleepPrevention = "idle"; # off|idle|display|system
         providers = {
@@ -138,7 +164,7 @@ in {
           mouse = true;
           # vimMode = true;
         };
-        prewalk = {enabled = false;};
+        prewalk.enabled = false;
         # codexResets.autoRedeem = unset (unset|yes|no)
         # codexResets.minBlockedMinutes = 60 (number)
         # codexResets.keepCredits = 0 (number)
@@ -148,6 +174,14 @@ in {
         # claudeResets.keepCredits = 0 (number)
         # claudeResets.salvageHorizonHours = 12 (number)
       };
+    };
+    home.activation.ompConfig = lib.mkIf (config.agents.omp.enableConfig && !config.agents.omp.enable) {
+      before = [];
+      after = ["writeBoundary"];
+      data = ''
+        run mkdir -p "$HOME/.omp/agent"
+        run install -m 600 ${configFile} "$HOME/.omp/agent/config.yml"
+      '';
     };
   };
 }

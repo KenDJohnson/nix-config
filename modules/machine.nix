@@ -40,7 +40,10 @@ in {
     agentTools.enable = mkEnableOption "agent tools (e.g. herdr)" // {default = true;};
     agents = {
       enable = mkEnableOption "agents and harnesses" // {default = true;};
-      omp.enable = mkEnableOption "OMP agent harness" // {default = false;};
+      omp = {
+        enable = mkEnableOption "OMP agent harness" // {default = false;};
+        enableConfig = mkEnableOption "Manage OMP agent config without managing omp install" // {default = false;};
+      };
     };
   };
 

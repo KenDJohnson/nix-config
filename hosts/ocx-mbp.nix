@@ -24,4 +24,8 @@
   };
   networkingTools = false;
   tmux.enable = true;
+  agents = {
+    enable = true;
+    omp.enableConfig = true;
+  };
 }

@@ -5,6 +5,10 @@
   machineLib,
   ...
 }: let
+  ternDir =
+    if pkgs.stdenv.hostPlatform.isDarwin
+    then "${config.home.homeDirectory}/Library/Application Support/Tern"
+    else "${config.xdg.configHome}/tern";
   machine = machineLib.forConfig config;
   nu = config.programs.nushell;
   nuExe = lib.getExe nu.package;
@@ -46,6 +50,28 @@
     export SHELL=${loginShell}/bin/nu
     exec ${nuExe} --login ${nuArgs} "$@"
   '';
+  json = pkgs.formats.json {};
+  settings = {
+    theme = "System";
+    theme_dark = "dark-arctic";
+    link_click = "Command";
+    link_target = "Browser";
+    font_family = "FiraCode Nerd Font Mono";
+    code_font = "FiraCode Nerd Font Mono";
+    pane_headers = "Always";
+    status_bar = true;
+    composer_text = "Markdown";
+    shell = "/etc/profiles/per-user/ken/bin/tern-nu-pane";
+    prefs_width = 641;
+    file_tree = {
+      open = true;
+    };
+    agents = {
+      own_tools = [
+        "codex"
+      ];
+    };
+  };
 in {
   config = lib.mkIf (pkgs.stdenv.hostPlatform.isDarwin && machine.hasRole "desktop" && nu.enable) {
     home.packages = [paneShell];
@@ -80,5 +106,20 @@ in {
         )
       }
     '';
+    programs.nushell.extraEnv = lib.mkAfter ''
+      if ($env.TERM_PROGRAM? == "tern" and ($env.TERN_PATH_PREPEND? | is-not-empty)) {
+          $env.PATH = ($env.TERN_PATH_PREPEND | split row ":" | path expand --no-symlink) ++ $env.PATH
+      }
+    '';
+    home.activation.ternConfig = lib.hm.dag.entryAfter ["linkGeneration"] (
+      lib.hm.generators.mkImpureConfigMerger {
+        inherit pkgs;
+        format = "json";
+        empty = "{}";
+        jqOperation = "$dynamic * $static";
+        path = "${ternDir}/settings.json";
+        staticSettings = json.generate "tern-settings.json" settings;
+      }
+    );
   };
 }

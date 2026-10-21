@@ -16,6 +16,10 @@
     latex = true;
   };
   networkingTools = true;
+  agents = {
+    enable = true;
+    omp.enableConfig = true;
+  };
 
   services.hindsight = {
     enable = true;
