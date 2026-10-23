@@ -37,6 +37,7 @@ in {
     tmux.enable = mkEnableOption "tmux";
     zed.enable = mkEnableOption "Zed editor";
     sshPersonalHosts = mkEnableOption "Personal/homelab SSH hosts";
+    ida.enable = mkEnableOption "IDA user environment (Nix Python for IDAPython, IDA venv)";
     agentTools.enable = mkEnableOption "agent tools (e.g. herdr)" // {default = true;};
     agents = {
       enable = mkEnableOption "agents and harnesses" // {default = true;};

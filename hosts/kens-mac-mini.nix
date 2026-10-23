@@ -22,6 +22,7 @@
     enable = true;
     omp.enableConfig = true;
   };
+  ida.enable = true;
 
   # Mac Mini: server-like behavior - prevent sleep but allow display off
   power = {

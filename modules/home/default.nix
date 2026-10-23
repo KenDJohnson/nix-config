@@ -11,6 +11,7 @@
     ./editors
     ./ghostty.nix
     ./desktop.nix
+    ./ida.nix
     ./dev-tools.nix
     ./work.nix
     ./networking.nix

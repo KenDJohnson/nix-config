@@ -123,6 +123,7 @@ in {
             zed = config.zed;
             agents = config.agents;
             sshPersonalHosts = config.sshPersonalHosts;
+            ida = config.ida;
             # Identity
             home.username = hostConfig.username;
             home.homeDirectory = hostConfig.homeDirectory;
