@@ -16,6 +16,20 @@ in {
     })
     ++ [loginShell];
   users.users.${primaryUser}.shell = loginShell;
+  environment.systemPackages = with pkgs; [
+    curl
+    fd
+    jq
+    jaq
+    less
+    ripgrep
+    tree-sitter
+    wget
+    jc
+    coreutils
+    btop
+    rsync
+  ];
 
   # nix-darwin only updates UserShell itself for users.knownUsers. Keep the
   # existing macOS admin account outside that list and manage just its shell.

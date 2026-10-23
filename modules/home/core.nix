@@ -68,6 +68,7 @@ in {
         python314
         qrrs
         devenv
+        rsync
       ]);
     stateVersion = "25.11";
   };

@@ -104,7 +104,7 @@ in {
         ];
 
         use core.nu
-        # use nix-deploy.nu *
+        use nix.nu *
 
         # source '${nu_scripts_file "sourced/typeof.nu"}'
         use gitv2 gs

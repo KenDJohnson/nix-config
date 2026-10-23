@@ -33,4 +33,7 @@
       harddisk = "never";
     };
   };
+  system.defaults.CustomUserPreferences."com.apple.screensaver" = {
+    idleTime = 0;
+  };
 }
