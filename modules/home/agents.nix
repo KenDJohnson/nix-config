@@ -79,7 +79,7 @@ in {
         github.enabled = true;
         hideThinkingBlock = true;
         interruptMode = "immediate";
-        # setupVersion = 2;
+        setupVersion = 2;
         live.voice = "sol"; # arbor|breeze|cove|ember|juniper|maple|sol|spruce|vale
         memory.backend = "hindsight";
         hindsight = {
