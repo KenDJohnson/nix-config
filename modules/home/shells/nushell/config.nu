@@ -418,12 +418,18 @@ do --env {
 }
 
 
-def nixswitch [] {
+def nixswitch [--no-remote] {
   # ^sudo darwin-rebuild switch --flake ($env.NIX_CONFIG_DIR | path join $".#(^scutil --get LocalHostName)")
-  if (is-darwin) {
-    nh darwin switch --ask $env.NIX_CONFIG_DIR
+  let remote = (not $no_remote) and (hostname) == "Kens-Mac-mini"
+  let subcmd = if (is-darwin) {
+    "darwin"
   } else {
-    nh home switch --ask $env.NIX_CONFIG_DIR
+    "home"
+  }
+  if $remote {
+    nh $subcmd switch --hostname (hostname) --ask --build-host Kens-MBP $env.NIX_CONFIG_DIR
+  } else {
+    nh $subcmd switch --hostname (hostname) --ask $env.NIX_CONFIG_DIR
   }
 }
 def "nixswitch doom" [] {
