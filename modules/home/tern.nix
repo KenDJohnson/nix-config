@@ -61,7 +61,8 @@
     pane_headers = "Always";
     status_bar = true;
     composer_text = "Markdown";
-    shell = "/etc/profiles/per-user/ken/bin/tern-nu-pane";
+    # shell = "/etc/profiles/per-user/${config.home.username}/bin/tern-nu-pane";
+    shell = "${lib.getExe paneShell}";
     prefs_width = 641;
     file_tree = {
       open = true;

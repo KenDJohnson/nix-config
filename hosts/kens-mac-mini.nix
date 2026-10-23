@@ -18,58 +18,9 @@
     latex = true;
   };
   networkingTools = true;
-
-  # users = {
-  #   knownGroups = ["nock"];
-  #   groups.nock = {
-  #     gid = 499;
-  #     description = "Nockchain service";
-  #     members = ["nock" "kjohnson"];
-  #   };
-
-  #   knownUsers = ["nock"];
-  #   users.nock = {
-  #     uid = 499;
-  #     gid = 499;
-  #     description = "Nockchain service";
-  #     home = "/var/db/nockchain";
-  #     createHome = false;
-  #     isHidden = true;
-
-  #     # nix-darwin defaults new managed users to /usr/bin/false.
-  #     # No password or interactive login is configured.
-  #   };
-  # };
-
-  services.nockchain-peer = {
-    enable = false;
-
-    p2pPort = 30000;
-
-    peers = [
-      "/ip4/203.0.113.10/udp/30000/quic-v1"
-    ];
-
-    rustLog = "info,nockchain::heartbeat=warn";
-
-    metrics = {
-      enable = true;
-      prometheusListenAddress = "127.0.0.1:9273";
-    };
-
-    publicGrpc = {
-      enable = false;
-      listenAddress = "127.0.0.1:5555";
-    };
-    user = "nock";
-    group = "nock";
-
-    # Optional overrides:
-    # user = "kjohnson";
-    # group = "staff";
-    # stateDirectory = "/var/db/nockchain";
-    # logDirectory = "/var/log/nockchain";
-    # package = pkgs.nockchain;
+  agents = {
+    enable = true;
+    omp.enableConfig = true;
   };
 
   # Mac Mini: server-like behavior - prevent sleep but allow display off
