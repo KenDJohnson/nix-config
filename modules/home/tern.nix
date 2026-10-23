@@ -61,8 +61,8 @@
     pane_headers = "Always";
     status_bar = true;
     composer_text = "Markdown";
-    # shell = "/etc/profiles/per-user/${config.home.username}/bin/tern-nu-pane";
-    shell = "${lib.getExe paneShell}";
+    # Saved pane commands must survive rebuilds and garbage collection.
+    shell = "${config.home.profileDirectory}/bin/tern-nu-pane";
     prefs_width = 641;
     file_tree = {
       open = true;
@@ -76,12 +76,27 @@
 in {
   config = lib.mkIf (pkgs.stdenv.hostPlatform.isDarwin && machine.hasRole "desktop" && nu.enable) {
     home.packages = [paneShell];
+    # After changing SHELL, use Tern's "Restart session daemon" to refresh the
+    # login shell advertised to remote clients without ending running panes.
     home.sessionVariables.SHELL = "${loginShell}/bin/nu";
 
     # Use the normal Home Manager config so plain `nu` panes, including restored
     # panes, get the payload too. Append after the existing title/config hooks.
     programs.nushell.extraConfig = lib.mkAfter ''
       if $env.TERM_PROGRAM? == "tern" {
+        # Apply after config.nu's PATH additions. Native shell integration may
+        # consume TERN_PATH_PREPEND before a nested Nu starts.
+        let tern_paths = (
+          $env.TERN_PATH_PREPEND?
+          | default ${builtins.toJSON "${ternDir}/omp/bin"}
+          | split row (char esep)
+          | where $it != ""
+          | path expand --no-symlink
+          | where {|dir| $dir | path exists}
+          | uniq
+        )
+        $env.PATH = $tern_paths ++ ($env.PATH | where {|dir| $dir not-in $tern_paths})
+
         $env.config.hooks.pre_execution = (
           $env.config.hooks.pre_execution? | default [] | append [
             {||
@@ -105,11 +120,6 @@ in {
             }
           ]
         )
-      }
-    '';
-    programs.nushell.extraEnv = lib.mkAfter ''
-      if ($env.TERM_PROGRAM? == "tern" and ($env.TERN_PATH_PREPEND? | is-not-empty)) {
-          $env.PATH = ($env.TERN_PATH_PREPEND | split row ":" | path expand --no-symlink) ++ $env.PATH
       }
     '';
     home.activation.ternConfig = lib.hm.dag.entryAfter ["linkGeneration"] (
