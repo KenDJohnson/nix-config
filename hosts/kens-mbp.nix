@@ -28,7 +28,7 @@
   };
 
   services.nockchain-peer = {
-    enable = true;
+    enable = false;
 
     p2pPort = 30000;
 
