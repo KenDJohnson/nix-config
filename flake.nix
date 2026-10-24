@@ -59,6 +59,12 @@
     omp.inputs.rust-overlay.follows = "rust-overlay";
 
     herdr.url = "github:herdrdev/herdr/v0.8.2";
+
+    # agentd: personal capture and recall daemon (private repo, fetched with
+    # the GitHub SSH key). No nixpkgs follows on purpose: agentd-snap's Full
+    # Disk Access grant is tied to its exact bytes, so it should only change
+    # when agentd itself changes. See docs/decisions.md D-22 in that repo.
+    agentd.url = "git+ssh://git@github.com/KenDJohnson/adhd-agent.git";
   };
 
   outputs = inputs @ {
