@@ -49,11 +49,11 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1792851649,
-        "narHash": "sha256-pmKwiwAtsv/shr+km26GSsnVkRWLZrOZNkBdY0Y6JYY=",
+        "lastModified": 1792871764,
+        "narHash": "sha256-vQOtPG2k9ybEl55cTIgq34Q/G8/b7OjHR1H+VVh0lYU=",
         "ref": "refs/heads/main",
-        "rev": "50be13c650fbea161f63557fda026443ffc120ff",
-        "revCount": 2,
+        "rev": "74c46e097256e1652dab32662bd3deae4323376d",
+        "revCount": 19,
         "type": "git",
         "url": "ssh://git@github.com/KenDJohnson/adhd-agent.git"
       },
