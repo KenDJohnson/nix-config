@@ -1,4 +1,4 @@
-{...}: {
+{inputs, pkgs, ...}: {
   machine.profiles.personal = true;
   machine.profiles.work = false;
   machine.roles.desktop = true;
@@ -61,4 +61,7 @@
     # logDirectory = "/var/log/nockchain";
     # package = pkgs.nockchain;
   };
+  environment.systemPackages = [
+    inputs.agentd.packages.${pkgs.stdenv.hostPlatform.system}.agentd-wispr-export
+  ];
 }

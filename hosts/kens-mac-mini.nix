@@ -49,8 +49,16 @@
     user = config.system.primaryUser;
     settings.inlets.wispr_flow = {
       enabled = true;
-      host = "kens-mbp";
+      host = "kens-mbp-agentd";
       device = "kens-mbp";
+      transport = "export";
     };
+  };
+  home-manager.users.kjohnson.programs.ssh.settings.kens-mbp-agentd = {
+    HostName = "Kens-MBP";
+    User = "kjohnson";
+    IdentityFile = "~/.ssh/agentd_ed25519";
+    IdentitiesOnly = "yes";
+    IdentityAgent = "none";
   };
 }
