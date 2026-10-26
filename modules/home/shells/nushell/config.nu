@@ -367,7 +367,7 @@ do --env {
         } else {
             path-prompt-body
         }
-        let body = $"($hostname)($repo_body)"
+        let body = $"($host)($repo_body)"
 
         def make_prefix []: string -> string {
             $"┫($in)(ansi light_yellow_bold)┣"
