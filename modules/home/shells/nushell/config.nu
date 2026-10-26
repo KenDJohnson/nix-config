@@ -349,13 +349,13 @@ do --env {
     ]: nothing -> string {
         let code = $env.LAST_EXIT_CODE
 
-        let hostname = if ($env.SSH_CONNECTION? | is-not-empty) {
-            let hostname = try {
+        let host = if ($env.SSH_CONNECTION? | is-not-empty) or ($env.TERM_PROGRAM? == "tern") {
+            let host = try {
                 hostname
             } catch {
                 "remote"
             }
-            $"@($hostname)" | with-ansi light_green_bold
+            $"@($host)" | with-ansi light_green_bold
         } else {
             ""
         }
