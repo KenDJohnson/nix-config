@@ -47,8 +47,10 @@
   services.agentd = {
     enable = true;
     user = config.system.primaryUser;
+    # Inlet modes (off/shadow/on, D-34). Every other inlet stays off until
+    # its scope is approved (docs/setup.md §14).
+    inlets.wispr_flow = "on";
     settings.inlets.wispr_flow = {
-      enabled = true;
       host = "kens-mbp-agentd";
       device = "kens-mbp";
       transport = "export";

@@ -62,6 +62,6 @@
     # package = pkgs.nockchain;
   };
   environment.systemPackages = [
-    inputs.agentd.packages.${pkgs.stdenv.hostPlatform.system}.agentd-wispr-export
+    inputs.agentd.packages.${pkgs.stdenv.hostPlatform.system}.agentd-export
   ];
 }
