@@ -46,14 +46,15 @@
     },
     "agentd": {
       "inputs": {
+        "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1793283714,
-        "narHash": "sha256-380FzmbzTjOOcIDeIpuuQUNloO1kQtJNkg+gS9nVXnA=",
+        "lastModified": 1793287974,
+        "narHash": "sha256-JfqYFDCWCkPuddmQueQ3DeOkOnbLZ5vdG4RkPVKiPXs=",
         "ref": "refs/heads/main",
-        "rev": "2f0e486f616352d69b16b001847d0330518bf2a9",
-        "revCount": 38,
+        "rev": "bfe227b0bd8a8dd09799e33f64174e1c94698648",
+        "revCount": 40,
         "type": "git",
         "url": "ssh://git@github.com/KenDJohnson/adhd-agent.git"
       },
@@ -512,6 +513,28 @@
     "nix-darwin": {
       "inputs": {
         "nixpkgs": [
+          "agentd",
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1792366139,
+        "narHash": "sha256-jto4pdsl0bgErQ5vaMc3gOyj//PILLRJuqX3I7fUk6s=",
+        "owner": "nix-darwin",
+        "repo": "nix-darwin",
+        "rev": "f0ec2b3fae4df92ea7788359aef9e07bb88d720f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-darwin",
+        "ref": "master",
+        "repo": "nix-darwin",
+        "type": "github"
+      }
+    },
+    "nix-darwin_2": {
+      "inputs": {
+        "nixpkgs": [
           "nixpkgs"
         ]
       },
@@ -780,7 +803,7 @@
         "gws": "gws",
         "herdr": "herdr",
         "home-manager": "home-manager",
-        "nix-darwin": "nix-darwin",
+        "nix-darwin": "nix-darwin_2",
         "nixpkgs": "nixpkgs_5",
         "nockchain-src": "nockchain-src",
         "omp": "omp",

@@ -61,7 +61,31 @@
     # logDirectory = "/var/log/nockchain";
     # package = pkgs.nockchain;
   };
-  environment.systemPackages = [
-    inputs.agentd.packages.${pkgs.stdenv.hostPlatform.system}.agentd-export
-  ];
+
+  # The laptop end of agentd's restricted ssh key (docs/setup.md §3, D-44):
+  # renders agentd-export's config and adds the forced-command line for the
+  # mini's key. Delete the hand-written agentd line from
+  # ~/.ssh/authorized_keys when switching; it would match first.
+  imports = [inputs.agentd.darwinModules.agentd-export];
+  programs.agentd-export = {
+    enable = true;
+    user = "kjohnson";
+    authorizedKeys = [
+      {
+        key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICWekCxtN+FJfPbbJ8+iLo5ioshMWcFl1H9+Hb9ao1bH agentd@Kens-Mac-mini";
+        # Tailscale's address ranges, the same in every tailnet: the key
+        # works only over Tailscale. Its private half exists only on the mini.
+        from = ["100.64.0.0/10" "fd7a:115c:a1e0::/48"];
+      }
+    ];
+    sources = {
+      wisprHistory.enable = true;
+      codingSessions.enable = true;
+      nushell = {
+        live = "/Users/kjohnson/.config/nushell/history.sqlite3";
+        archive = "/Users/kjohnson/Library/Application Support/nushell/history.sqlite3";
+      };
+      git.roots = ["/Users/kjohnson/git"];
+    };
+  };
 }
