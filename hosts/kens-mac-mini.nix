@@ -60,8 +60,12 @@
       nushell_archive_mini = "on";
       nushell_mbp = "on";
       nushell_archive_mbp = "on";
-      git_mini = "on";
+      # Off: macOS blocks the daemon from ~/Documents and the scan hung
+      # (2026-10-29). Turn back on with a root outside ~/Documents,
+      # ~/Desktop and ~/Downloads (docs/setup.md §17).
+      git_mini = "off";
       git_mbp = "on";
+      chat_import = "shadow";
     };
     settings.inlets = {
       wispr_flow = {
@@ -85,7 +89,6 @@
         };
         max_bytes_per_day = 1073741824;
       };
-      git_mini.roots = ["/Users/kjohnson/Documents"];
     };
   };
   home-manager.users.kjohnson.programs.ssh.settings.kens-mbp-agentd = {
