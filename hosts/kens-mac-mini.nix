@@ -48,54 +48,82 @@
   services.agentd = {
     enable = true;
     user = config.system.primaryUser;
-    # Inlet modes (off/shadow/on, D-34). Scopes approved from dry runs on
-    # 2026-10-26 (docs/setup.md §14); chat_import stays off.
-    inlets = {
-      wispr_flow = "on";
-      wispr_scratchpad = "on";
-      wispr_meetings = "on";
-      coding_sessions_mini = "on";
-      coding_sessions_mbp = "on";
-      nushell_mini = "on";
-      nushell_archive_mini = "on";
-      nushell_mbp = "on";
-      nushell_archive_mbp = "on";
-      # Off: macOS blocks the daemon from ~/Documents and the scan hung
-      # (2026-10-29). Turn back on with a root outside ~/Documents,
-      # ~/Desktop and ~/Downloads (docs/setup.md §17).
-      git_mini = "off";
-      git_mbp = "on";
-      chat_import = "shadow";
+    # The MacBook: agentd runs ssh with these settings itself and reaches
+    # agentd-export there (programs.agentd-export in hosts/kens-mbp.nix;
+    # docs/setup.md §3, §21).
+    hosts.mbp = {
+      hostname = "Kens-MBP";
+      user = "kjohnson";
+      identityFile = "/Users/kjohnson/.ssh/agentd_ed25519";
     };
-    settings.inlets = {
-      wispr_flow = {
-        host = "kens-mbp-agentd";
-        device = "kens-mbp";
-        transport = "export";
+    # One instance per machine for each kind (D-43); modes off/shadow/on
+    # (D-34). Source ids are <kind>_<instance>, so the history recorded
+    # before instances continues.
+    inlets = {
+      wispr_scratchpad.mode = "on";
+      wispr_meetings.mode = "on";
+      chat_import.mode = "shadow";
+      wispr_flow.mbp = {
+        mode = "on";
+        type = "ssh";
+        host = "mbp";
+        source = "wispr_flow"; # the id used before instances
       };
       # Never keep the old employer onboarding transcripts (enablement plan,
-      # "Needs Ken" 1), even before they are deleted at the source.
-      # max_bytes_per_day: 1 GiB instead of the 256 MiB default (X.15, D-41),
-      # so the initial backfill lands in one day. Remove to go back.
-      coding_sessions_mini = {
-        exclude.repos = ["~/work"];
-        max_bytes_per_day = 1073741824;
-      };
-      coding_sessions_mbp = {
-        host = "kens-mbp-agentd";
-        exclude = {
-          paths = ["~/.claude/projects/-Users-kjohnson-work*"];
-          repos = ["~/work"];
+      # "Needs Ken" 1). max_bytes_per_day: 1 GiB instead of the 256 MiB
+      # default (X.15, D-41), so a backfill lands in one day.
+      coding_sessions = {
+        mini = {
+          mode = "on";
+          type = "local";
+          exclude.repos = ["~/work"];
+          max_bytes_per_day = 1073741824;
         };
-        max_bytes_per_day = 1073741824;
+        mbp = {
+          mode = "on";
+          type = "ssh";
+          host = "mbp";
+          exclude = {
+            paths = ["~/.claude/projects/-Users-kjohnson-work*"];
+            repos = ["~/work"];
+          };
+          max_bytes_per_day = 1073741824;
+        };
+      };
+      nushell = {
+        mini = {
+          mode = "on";
+          type = "local";
+        };
+        archive_mini = {
+          mode = "on";
+          type = "local";
+          db = "/Users/kjohnson/Library/Application Support/nushell/history.sqlite3";
+        };
+        mbp = {
+          mode = "on";
+          type = "ssh";
+          host = "mbp";
+        };
+        archive_mbp = {
+          mode = "on";
+          type = "ssh";
+          host = "mbp";
+          history = "archive";
+        };
+      };
+      git = {
+        mini = {
+          mode = "on";
+          type = "local";
+          roots = ["/Users/kjohnson/git"];
+        };
+        mbp = {
+          mode = "on";
+          type = "ssh";
+          host = "mbp";
+        };
       };
     };
-  };
-  home-manager.users.kjohnson.programs.ssh.settings.kens-mbp-agentd = {
-    HostName = "Kens-MBP";
-    User = "kjohnson";
-    IdentityFile = "~/.ssh/agentd_ed25519";
-    IdentitiesOnly = "yes";
-    IdentityAgent = "none";
   };
 }
