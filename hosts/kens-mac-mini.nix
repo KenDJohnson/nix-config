@@ -62,7 +62,7 @@
     inlets = {
       wispr_scratchpad.mode = "on";
       wispr_meetings.mode = "on";
-      chat_import.mode = "shadow";
+      chat_import.mode = "on";
       wispr_flow.mbp = {
         mode = "on";
         type = "ssh";
