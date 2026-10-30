@@ -28,9 +28,53 @@ in {
   networkingTools = true;
   agents = {
     enable = true;
-    omp.enableConfig = true;
+    omp = {
+      enableConfig = true;
+      hindsight.apiUrl = "https://kens-mac-mini.thrush-mimosa.ts.net:8443";
+    };
   };
   ida.enable = true;
+
+  # Shared memory backend for the personal Macs. After restoring its database:
+  # CODEX_HOME="$HOME/.local/share/hindsight/codex" codex login
+  services.hindsight = {
+    enable = true;
+    llmProvider = "openai-codex";
+    llmModel = "gpt-6-luna";
+  };
+
+  # Share only the API over the encrypted tailnet, not the LAN or public net.
+  # Foreground Serve is removed when launchd unloads this job.
+  # The sandboxed macOS Tailscale app requires the user's GUI bootstrap domain.
+  # HTTPS on 8443 starts at graphical login; API/PostgreSQL remain boot daemons.
+  # Restart: launchctl kickstart -k "gui/$(id -u)/org.nixos.hindsight-tailnet"
+  launchd.user.agents.hindsight-tailnet.serviceConfig = {
+    ProgramArguments = [
+      "/bin/sh"
+      "-c"
+      # Do not exec: the app's CLI also needs a shell parent under launchd.
+      ''"$@"; result=$?; exit "$result"''
+      "hindsight-tailnet"
+      "/Applications/Tailscale.app/Contents/MacOS/tailscale"
+      "serve"
+      "--bg=false"
+      "--https=8443"
+      "http://127.0.0.1:${toString config.services.hindsight.apiPort}"
+    ];
+    LimitLoadToSessionType = "Aqua";
+    WorkingDirectory = homeDirectory;
+    EnvironmentVariables = {
+      HOME = homeDirectory;
+      # Explicit CLI mode instead of relying on terminal environment heuristics.
+      TAILSCALE_BE_CLI = "true";
+    };
+    RunAtLoad = true;
+    KeepAlive = true;
+    ThrottleInterval = 30;
+    Umask = 63;
+    StandardOutPath = "${config.services.hindsight.logDirectory}/tailnet.log";
+    StandardErrorPath = "${config.services.hindsight.logDirectory}/tailnet.error.log";
+  };
 
   # Mac Mini: server-like behavior - prevent sleep but allow display off
   power = {

@@ -197,7 +197,19 @@ in {
     databaseDirectory = lib.mkOption {
       type = lib.types.str;
       default = "${homeDirectory}/.local/share/hindsight/postgresql-${cfg.databasePackage.psqlSchema}";
-      description = "Owner-only persistent PostgreSQL cluster and Unix socket directory. PostgreSQL does not listen on TCP.";
+      description = ''
+        Owner-only persistent PostgreSQL cluster and Unix socket directory.
+        PostgreSQL does not listen on TCP.
+
+        To migrate hosts, stop the source API, UI, and any manual workers but
+        leave PostgreSQL running. Use the configured databasePackage's pg_dump
+        in custom format over this Unix socket to back up the whole hindsight
+        database. Restore with pg_restore --single-transaction into a fresh
+        database while destination API/UI jobs are stopped; retain the old
+        database until the new host is verified. Do not copy a live cluster.
+        Authenticate a fresh dedicated Codex home on the destination rather
+        than sharing its rotating OAuth credentials with the source.
+      '';
     };
 
     package = lib.mkOption {

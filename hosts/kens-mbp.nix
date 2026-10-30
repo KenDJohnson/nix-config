@@ -18,13 +18,11 @@
   networkingTools = true;
   agents = {
     enable = true;
-    omp.enableConfig = true;
-  };
-
-  services.hindsight = {
-    enable = true;
-    llmProvider = "openai-codex";
-    llmModel = "gpt-6-luna";
+    omp = {
+      enableConfig = true;
+      # The mini's HTTPS API is reachable only within the Tailscale network.
+      hindsight.apiUrl = "https://kens-mac-mini.thrush-mimosa.ts.net:8443";
+    };
   };
 
   services.nockchain-peer = {
