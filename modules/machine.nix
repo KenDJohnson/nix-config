@@ -44,6 +44,12 @@ in {
       omp = {
         enable = mkEnableOption "OMP agent harness" // {default = false;};
         enableConfig = mkEnableOption "Manage OMP agent config without managing omp install" // {default = false;};
+        hindsight.apiUrl = mkOption {
+          type = types.str;
+          default = "http://localhost:8888";
+          example = "https://hindsight.example.ts.net:8443";
+          description = "Base URL of the Hindsight API used by the OMP agent harness.";
+        };
       };
     };
   };

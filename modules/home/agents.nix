@@ -83,7 +83,7 @@ in {
         live.voice = "sol"; # arbor|breeze|cove|ember|juniper|maple|sol|spruce|vale
         memory.backend = "hindsight";
         hindsight = {
-          apiUrl = "http://localhost:8888";
+          apiUrl = config.agents.omp.hindsight.apiUrl;
           bankId = "omp";
 
           scoping = "global"; # global|per-project|per-project-tagged
