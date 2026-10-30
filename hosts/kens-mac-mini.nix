@@ -1,13 +1,10 @@
 {
   config,
   inputs,
-  lib,
-  pkgs,
   ...
 }: let
   user = config.system.primaryUser;
   homeDirectory = config.users.users.${user}.home;
-  t3LogDirectory = "${homeDirectory}/Library/Logs/t3";
 in {
   imports = [inputs.agentd.darwinModules.default];
 
@@ -90,52 +87,7 @@ in {
     idleTime = 0;
   };
 
-  # T3 Code stays installed outside Nix in ~/.local/bin. Start at boot as the
-  # primary user, headless and loopback-only at http://127.0.0.1:3773.
-  # The explicit PATH includes Nix profiles; the native shell waits for
-  # /nix/store to mount. Logs: ~/Library/Logs/t3/.
-  # After updating t3: sudo launchctl kickstart -k system/org.nixos.t3
-  system.activationScripts.t3.text = ''
-    ${pkgs.coreutils}/bin/install -d -m 0700 -o ${lib.escapeShellArg user} -g staff ${lib.escapeShellArg t3LogDirectory}
-  '';
-
-  launchd.daemons.t3.serviceConfig = {
-    ProgramArguments = [
-      "/bin/sh"
-      "-c"
-      ''/bin/wait4path /nix/store && exec "$@"''
-      "t3"
-      "${homeDirectory}/.local/bin/t3"
-      "serve"
-      "--host"
-      "127.0.0.1"
-      "--port"
-      "3773"
-    ];
-    UserName = user;
-    GroupName = "staff";
-    WorkingDirectory = homeDirectory;
-    EnvironmentVariables = {
-      HOME = homeDirectory;
-      PATH = lib.concatStringsSep ":" [
-        "${homeDirectory}/.local/bin"
-        "${homeDirectory}/.nix-profile/bin"
-        "/etc/profiles/per-user/${user}/bin"
-        "/run/current-system/sw/bin"
-        "/nix/var/nix/profiles/default/bin"
-        "/usr/bin"
-        "/bin"
-        "/usr/sbin"
-        "/sbin"
-      ];
-    };
-    RunAtLoad = true;
-    KeepAlive = true;
-    ThrottleInterval = 30;
-    Umask = 63;
-    StandardOutPath = "${t3LogDirectory}/t3.log";
-    StandardErrorPath = "${t3LogDirectory}/t3.error.log";
-  };
+  # T3 Code's user service is managed outside Nix with `t3 service install`.
 
   # Capture daemon: polls Apple Notes (via the agentd-snap Full Disk Access
   # helper), Wispr Flow, coding-agent sessions, Nushell history and git
